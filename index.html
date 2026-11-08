@@ -19,104 +19,91 @@
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#000; --green:#3dff7a; --green2:#22c55e; --dim:#1d5e33; --gold:#e3c27a;
-    --ed-bg:#0d1117; --ed-bar:#010409; --ed-line:#6e7681; --ed-text:#e6edf3; --ed-border:#21262d;
+    --green:#3dff7a; --green2:#22c55e; --gdim:#3f7a52; --gold:#e3c27a; --text:#f0f3f6; --grey:#7d8590;
     --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
     --arabic:"Amiri","Traditional Arabic",serif;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-  html,body{height:100%;background:var(--bg);color:var(--ed-text);overflow:hidden}
+  html,body{height:100%;background:#000;color:var(--text);overflow:hidden}
   body{font-family:var(--mono);-webkit-font-smoothing:antialiased;touch-action:manipulation}
   #stage{position:fixed;inset:0;height:100dvh;overflow:hidden}
   canvas.layer{position:absolute;left:0;top:0;pointer-events:none}
-  #photo{position:absolute;opacity:0;transition:opacity 2.2s ease, filter 1.6s ease;pointer-events:none;-webkit-user-drag:none}
-  #photo.show{opacity:1}
-  #photo.out{opacity:0;filter:brightness(.2)}
-  #scan{position:absolute;height:2px;background:linear-gradient(90deg,transparent,#c9ffd9,transparent);
-        box-shadow:0 0 16px 3px rgba(61,255,122,.5);opacity:0;pointer-events:none}
-
-  /* start */
-  #start{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 22px;gap:30px;
-         color:var(--green);z-index:20;transition:opacity .6s}
-  #start .lines{font-size:15px;line-height:1.9;max-width:520px;margin:0 auto;width:100%}
-  #start .lines div{opacity:0;animation:fadeIn .25s forwards}
-  #start .muted{color:#3f7a52}
-  .btns{display:flex;flex-direction:column;gap:12px;max-width:520px;margin:0 auto;width:100%;opacity:0;animation:fadeIn .5s 1.6s forwards}
-  .btn{font-family:var(--mono);font-size:15px;padding:15px 16px;border-radius:6px;border:1px solid var(--green2);background:transparent;
-       color:var(--green);cursor:pointer;text-align:left}
-  .btn:active{background:rgba(61,255,122,.12)}
-  .btn.ghost{border-color:#1b3a26;color:#3f7a52;font-size:13px;padding:12px 16px}
+  #photo{position:absolute;opacity:0;pointer-events:none;-webkit-user-drag:none;transition:opacity 1.4s, filter 1.4s}
+  #scan{position:absolute;height:1px;background:#bfffd3;box-shadow:0 0 14px 2px rgba(61,255,122,.55);opacity:0;pointer-events:none}
   .cur::after{content:"█";animation:blink 1s steps(1) infinite;margin-left:1px;color:var(--green)}
   @keyframes blink{50%{opacity:0}}
   @keyframes fadeIn{to{opacity:1}}
 
+  /* start */
+  #start{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 22px;gap:30px;color:var(--green);z-index:20;transition:opacity .6s}
+  #start .lines{font-size:15px;line-height:1.9;max-width:560px;margin:0 auto;width:100%}
+  #start .lines div{opacity:0;animation:fadeIn .25s forwards}
+  #start .muted{color:var(--gdim)}
+  .btns{display:flex;flex-direction:column;gap:12px;max-width:560px;margin:0 auto;width:100%;opacity:0;animation:fadeIn .5s 1.6s forwards}
+  .btn{font-family:var(--mono);font-size:16px;padding:16px;border-radius:6px;border:1px solid var(--green2);background:transparent;color:var(--green);cursor:pointer;text-align:left}
+  .btn.ghost{border-color:#1b3a26;color:var(--gdim);font-size:13px;padding:12px 16px}
+
   /* terminal */
-  #term{position:absolute;inset:0;padding:calc(24px + env(safe-area-inset-top)) 16px 24px;display:flex;flex-direction:column;justify-content:flex-end;
-        color:#c9d1d9;font-size:13px;line-height:1.7;z-index:12;opacity:0;transition:opacity .7s;pointer-events:none;overflow:hidden}
+  #term{position:absolute;inset:0;padding:calc(24px + env(safe-area-inset-top)) 18px 28px;display:flex;flex-direction:column;justify-content:flex-end;
+        color:#c9d1d9;font-size:14px;line-height:1.75;z-index:12;opacity:0;transition:opacity .7s;pointer-events:none;overflow:hidden}
   #term .inner{max-width:640px;margin:0 auto;width:100%}
-  #term .p{color:var(--green)} #term .h{color:#e3b341} #term .t{color:#6e7681} #term .w{color:#fff}
-  #term .big{font-size:17px;color:#fff;margin-top:4px}
+  #term .p{color:var(--green)} #term .h{color:#e3b341} #term .t{color:var(--grey)} #term .w{color:#fff;font-weight:700}
+  #term .big{font-size:19px;color:#fff;margin-top:6px;line-height:1.5}
   #term .row{white-space:pre-wrap;word-break:break-word}
 
   /* verse */
   #verse{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
-         padding:0 20px;z-index:13;opacity:0;transition:opacity 1.4s;pointer-events:none;background:rgba(0,0,0,.78)}
+         padding:0 20px;z-index:13;opacity:0;transition:opacity 1.4s;pointer-events:none;background:rgba(0,0,0,.8)}
   #verse .ar{font-family:var(--arabic);font-size:clamp(40px,11vw,72px);color:var(--gold);direction:rtl;line-height:1.7}
-  #verse .tr{font-family:var(--mono);font-size:clamp(17px,4.6vw,22px);color:#fff;margin-top:14px;line-height:1.5}
-  #verse .ref{font-size:12px;color:#8b949e;margin-top:10px;letter-spacing:1px}
+  #verse .tr{font-size:clamp(18px,5vw,24px);color:#fff;margin-top:16px;line-height:1.5}
+  #verse .ref{font-size:12px;color:var(--grey);margin-top:10px}
 
-  /* editor */
-  #editor{position:absolute;inset:0;z-index:14;display:flex;flex-direction:column;background:var(--ed-bg);opacity:0;transition:opacity 1.2s;pointer-events:none}
-  #editor.show{opacity:1;pointer-events:auto}
-  .tabbar{display:flex;align-items:flex-end;height:calc(38px + env(safe-area-inset-top));padding-top:env(safe-area-inset-top);background:var(--ed-bar);border-bottom:1px solid var(--ed-border)}
-  .tab{font-size:12.5px;color:#e6edf3;padding:10px 16px;background:var(--ed-bg);border-top:2px solid var(--green2);border-right:1px solid var(--ed-border)}
-  .tab .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#c9d1d9;margin-left:10px;vertical-align:middle}
-  .tab.saved .dot{background:transparent;border:1px solid #6e7681}
-  .tab2{font-size:12.5px;color:#6e7681;padding:10px 14px}
-  #code{flex:1;overflow-y:auto;padding:16px 14px 40px 0;font-size:15.5px;line-height:1.7;-webkit-overflow-scrolling:touch}
-  .ln{display:grid;grid-template-columns:38px 1fr;gap:12px}
-  .ln .n{color:var(--ed-line);text-align:right;font-size:12px;padding-top:3px;user-select:none}
-  .ln .c{white-space:pre-wrap;word-break:break-word;color:var(--ed-text);min-height:1.7em}
-  .ln.active{background:rgba(110,118,129,.08)}
-  .ln.active .n{color:#e6edf3}
-  .ln .c.sign{color:#7ee787}
-  .caret{display:inline-block;width:.55em;height:1.15em;background:#e6edf3;vertical-align:text-bottom;animation:blink 1.05s steps(1) infinite;margin-left:1px}
-  .caret.typing{animation:none}
-  #panel{height:0;overflow:hidden;background:var(--ed-bar);border-top:1px solid var(--ed-border);transition:height .6s ease;font-size:12.5px;line-height:1.75;color:#c9d1d9}
-  #panel.open{height:230px}
-  #panel .head{font-size:11px;color:#8b949e;padding:7px 14px;border-bottom:1px solid var(--ed-border);letter-spacing:1px}
-  #panel .body{padding:8px 14px}
-  #panel .p{color:var(--green)} #panel .ok{color:#7ee787} #panel .t{color:#6e7681}
-  .status{display:flex;justify-content:space-between;gap:10px;font-size:11px;color:#c9d1d9;background:#0f2a19;padding:4px 12px calc(4px + env(safe-area-inset-bottom));white-space:nowrap;overflow:hidden}
-  .status span{overflow:hidden;text-overflow:ellipsis}
-  #tapHint{position:absolute;right:12px;bottom:calc(34px + env(safe-area-inset-bottom));font-size:11px;color:#484f58;z-index:15;opacity:0;transition:opacity 1s;pointer-events:none}
+  /* slides */
+  #slides{position:absolute;inset:0;z-index:14;background:#000;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity 1s}
+  #slides.show{opacity:1;pointer-events:auto}
+  #sTop{display:flex;justify-content:space-between;align-items:center;padding:calc(16px + env(safe-area-inset-top)) 20px 0;font-size:12px;color:var(--grey);min-height:44px}
+  #sHead{color:var(--green2)}
+  #sBody{flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 24px;max-width:640px;width:100%;margin:0 auto}
+  #sCard{font-size:14px;border:1px solid #21262d;background:#0d1117;border-radius:8px;padding:12px 14px;margin-bottom:26px;display:none;line-height:1.8}
+  #sCard .f{color:var(--grey);font-size:12px;border-bottom:1px solid #21262d;padding-bottom:6px;margin-bottom:8px}
+  #sCard .k{color:#ff7b72} #sCard .v{color:#a5d6ff} #sCard .gold{color:var(--gold);font-weight:700}
+  #sText{font-size:clamp(21px,5.9vw,28px);line-height:1.6;color:var(--text);white-space:pre-wrap;word-break:break-word;min-height:3em}
+  #sText.big{font-size:clamp(28px,8.4vw,44px);font-weight:700;line-height:1.35;color:#fff}
+  #sText.big.gold{color:var(--gold)}
+  #sText .caret{display:inline-block;width:.5em;height:1.05em;background:var(--green);vertical-align:-0.12em;margin-left:2px;animation:blink 1s steps(1) infinite}
+  #sBot{display:flex;justify-content:space-between;align-items:center;padding:0 20px calc(22px + env(safe-area-inset-bottom));gap:12px}
+  #sNum{font-size:12px;color:var(--grey);min-width:60px}
+  #sBack{font-family:var(--mono);font-size:13px;color:var(--grey);background:none;border:none;padding:12px 6px;cursor:pointer;visibility:hidden}
+  #sNext{font-family:var(--mono);font-size:16px;color:#000;background:var(--green);border:none;border-radius:6px;padding:14px 22px;cursor:pointer;
+         opacity:0;transform:translateY(6px);transition:opacity .35s, transform .35s;pointer-events:none;font-weight:700}
+  #sNext.on{opacity:1;transform:none;pointer-events:auto;animation:nudge 2.4s 1.5s ease-in-out infinite}
+  @keyframes nudge{0%,100%{transform:none}50%{transform:translateX(4px)}}
+  #sBar{height:2px;background:#161b22;margin:0 20px 14px}
+  #sBar i{display:block;height:100%;width:0;background:var(--green2);transition:width .5s}
 
-  /* final */
-  #final{position:absolute;inset:0;z-index:16;overflow-y:auto;-webkit-overflow-scrolling:touch;opacity:0;pointer-events:none;transition:opacity 1.8s;background:#000}
+  /* final — bitta ekranga sig'adi */
+  #final{position:absolute;inset:0;z-index:16;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;text-align:center;
+         padding:calc(18px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom));opacity:0;pointer-events:none;transition:opacity 1.8s;background:#000}
   #final.show{opacity:1;pointer-events:auto}
-  #bgRain{position:fixed;inset:0;z-index:0;opacity:.16;pointer-events:none}
-  #final .wrap{position:relative;z-index:2;max-width:520px;margin:0 auto;padding:calc(30px + env(safe-area-inset-top)) 18px calc(56px + env(safe-area-inset-bottom));text-align:center}
-  #final .meta{font-size:11.5px;color:#3f7a52;letter-spacing:1px}
-  #final .photo{margin:16px auto 0;width:min(100%,420px);border:1px solid #2b3a30;padding:6px;background:#050805}
-  #final .photo img{display:block;width:100%}
-  #final .names{font-size:clamp(22px,6.6vw,34px);color:#fff;margin-top:24px;font-weight:700;letter-spacing:.5px;white-space:nowrap}
+  #bgRain{position:absolute;inset:0;z-index:0;opacity:.14;pointer-events:none}
+  #final > *:not(canvas){position:relative;z-index:2}
+  #final .photo{border:1px solid #2b3a30;padding:5px;background:#050805}
+  #final .photo img{display:block;height:min(52dvh,560px);width:auto;max-width:86vw;object-fit:cover}
+  #final .names{font-size:clamp(22px,6.6vw,34px);color:#fff;margin-top:18px;font-weight:700;white-space:nowrap}
   #final .names .amp{color:var(--green);font-weight:400;margin:0 .35em}
-  #final .sub{font-size:16px;color:#c9d1d9;margin-top:8px}
-  #final .ar{font-family:var(--arabic);direction:rtl;color:var(--gold);font-size:clamp(22px,6.2vw,30px);line-height:1.9;margin-top:30px}
-  #final .artr{color:#c9d1d9;font-size:13.5px;margin-top:6px;line-height:1.7}
-  #final .sign{margin-top:34px;font-size:15px;color:#7ee787;line-height:1.7}
-  #final .sign .t{color:#6e7681}
-  #final .acts{display:flex;gap:10px;justify-content:center;margin-top:28px;flex-wrap:wrap}
-  #final button{font-family:var(--mono);font-size:13px;color:var(--green);background:transparent;border:1px solid #1d5e33;padding:11px 16px;border-radius:6px;cursor:pointer}
+  #final .sub{font-size:clamp(16px,4.6vw,20px);color:var(--gold);margin-top:8px}
+  #final .sign{margin-top:14px;font-size:13px;color:var(--grey)}
+  #final .acts{display:flex;gap:10px;justify-content:center;margin-top:18px}
+  #final button{font-family:var(--mono);font-size:13px;color:var(--green);background:transparent;border:1px solid #1d5e33;padding:10px 14px;border-radius:6px;cursor:pointer}
 
-  #snd{position:absolute;top:calc(10px + env(safe-area-inset-top));right:10px;z-index:30;height:30px;padding:0 10px;border-radius:4px;
-       border:1px solid #1f3a28;background:rgba(0,0,0,.6);color:#3f7a52;font-family:var(--mono);font-size:11px;cursor:pointer;display:none}
+  #snd{position:absolute;top:calc(10px + env(safe-area-inset-top));right:10px;z-index:30;height:28px;padding:0 9px;border-radius:4px;
+       border:1px solid #1f3a28;background:rgba(0,0,0,.6);color:var(--gdim);font-family:var(--mono);font-size:11px;cursor:pointer;display:none}
+  #slides.show ~ #snd{top:auto;bottom:calc(84px + env(safe-area-inset-bottom))}
 </style>
 </head>
 <body>
 <div id="stage">
   <canvas id="lockCv" class="layer"></canvas>
-  <canvas id="colorCv" class="layer" style="opacity:0"></canvas>
   <img id="photo" src="juftlik.jpg" alt="Kuyov va kelin" decoding="async">
   <canvas id="rainCv" class="layer"></canvas>
   <div id="scan"></div>
@@ -124,7 +111,7 @@
   <div id="start">
     <div class="lines" id="startLines"></div>
     <div class="btns">
-      <button class="btn" id="goSound">$ ./akamga <span style="color:#3f7a52">  ← ochish (ovoz bilan)</span></button>
+      <button class="btn" id="goSound">▶ ochish <span style="color:var(--gdim)">(ovoz bilan)</span></button>
       <button class="btn ghost" id="goMute">ovozsiz ochish</button>
     </div>
   </div>
@@ -137,28 +124,29 @@
     <div class="ref">Naba surasi, 8-oyat</div>
   </div>
 
-  <div id="editor">
-    <div class="tabbar"><div class="tab" id="tab">akamga.txt<span class="dot"></span></div><div class="tab2">rasm.jpg</div></div>
-    <div id="code"></div>
-    <div id="panel"><div class="head">TERMINAL</div><div class="body" id="panelBody"></div></div>
-    <div class="status"><span id="stL">ukang@seoul · main</span><span id="stR">Ln 1, Col 1 · UTF-8</span></div>
+  <div id="slides">
+    <div id="sTop"><span id="sHead"></span><span></span></div>
+    <div id="sBody">
+      <div id="sCard"></div>
+      <div id="sText"></div>
+    </div>
+    <div id="sBar"><i id="sBarI"></i></div>
+    <div id="sBot">
+      <button id="sBack">← orqaga</button>
+      <span id="sNum"></span>
+      <button id="sNext">davom →</button>
+    </div>
   </div>
-  <div id="tapHint">bosib tursang — tezroq</div>
 
   <div id="final">
     <canvas id="bgRain"></canvas>
-    <div class="wrap">
-      <div class="meta" id="fMeta"></div>
-      <div class="photo"><img src="juftlik.jpg" alt="Kuyov va kelin"></div>
-      <div class="names" id="fNames"></div>
-      <div class="sub">To'ylaringiz muborak bo'lsin!</div>
-      <div class="ar">بَارَكَ اللَّهُ لَكَ، وَبَارَكَ عَلَيْكَ، وَجَمَعَ بَيْنَكُمَا فِي خَيْرٍ</div>
-      <div class="artr">Alloh senga baraka bersin, ustingga baraka yog'dirsin<br>va ikkovingizni yaxshilikda jamlasin.</div>
-      <div class="sign" id="fSign"></div>
-      <div class="acts">
-        <button id="reread">xatni qayta o'qish</button>
-        <button id="replay">boshidan</button>
-      </div>
+    <div class="photo"><img src="juftlik.jpg" alt="Kuyov va kelin"></div>
+    <div class="names" id="fNames"></div>
+    <div class="sub">To'ylaringiz muborak bo'lsin!</div>
+    <div class="sign" id="fSign"></div>
+    <div class="acts">
+      <button id="reread">xatni qayta o'qish</button>
+      <button id="replay">boshidan</button>
     </div>
   </div>
 
@@ -173,62 +161,45 @@
 
 <script>
 /* ============ SOZLAMALAR ============ */
-const CONFIG = {
-  aka: "Muhammadrizo",
-  kelin: "Rano",
-  kelinMurojaat: "kennayam",
-  sana: "09.11.2026",
-};
+const CONFIG = { aka: "Muhammadrizo", kelin: "Rano", kelinMurojaat: "kennayam", sana: "08.11.2026" };
 
-/* ============ XAT (uka tilidan) ============
-   [[p:ms]] — to'xtab o'ylash,  [[d:N]] — N ta harfni o'chirish,  [[slow]] — sekin yozish */
-const LETTER = [
-  "Assalomu alaykum, akam.",
-  "",
-  "Bugun to'ying. Eng uzoq kutilgan kun.[[p:500]] Seni chin qalbimdan tabriklayman, aka. Chin yuragimdan baxt tilayman.",
-  "",
-  "Bugun seni kuyov kiyimida ko'rdim. Juda xursand bo'ldim. Senga juda yarasharkan, aka.[[p:800]] Rostdan.",
-  "",
-  "To'yingda ukang bo'lib oldingda turishni, to'yingni o'z ko'zim bilan ko'rishni juda xohlagandim.[[p:1000]] Lekin bo'lmadi.",
-  "Yoningda bo'lolmaganim uchun meni kechir, aka.",
-  "Telefonda bo'lsa ham ko'rdim. Shunga ham xursandman. To'ying zo'r o'tyapti, men kutganimdan ham yaxshi.",
-  "",
-  "Aslida senga aytadigan gapim ko'p.[[p:700]] Lekin [[p:600]][[d:6]]Yuzma-yuz hech qachon aytolmasdim. Shuning uchun shu yerga yozyapman.",
-  "",
-  "Shu kungacha eng ko'p qiyinchilikni sen ko'rding. Eng og'ir sinovlardan sen o'tding. Lekin hech qachon taslim bo'lmading.",
-  "Biz uchun qo'lingdan kelgan hamma narsani qilding. Meni doim, har tomonlama qo'llab-quvvatlading. Hozirgacha ham.",
-  "Men hammasini ko'rib turardim, aka.[[p:900]] Hech qachon unutmayman.",
-  "",
-  "Sendek akam borligidan faxrlanaman. Ko'p narsada menga o'rnak bo'lgansan.",
-  "Sen men uchun dunyodagi eng zo'r akasan.",
-  "",
-  "[[p:1200]][[slow]]Seni yaxshi ko'raman, akam.[[p:1600]]",
-  "Hammasi uchun rahmat.",
-  "Va'da beraman — inshaalloh, hali hammasining rohatini ko'rasizlar.",
-  "",
-  `Akam, ${CONFIG.kelin} ${CONFIG.kelinMurojaat} — ikkovingizni ham chin yurakdan tabriklayman.`,
-  "Baxtli bo'linglar, qo'sha qaringlar. Uzoq umr ko'ringlar, doim sog'-salomat bo'linglar.",
-  "Shu kundan keyingi hayotingiz faqat yaxshi kunlar, quvonch va baxtga to'la bo'lsin. Bir-biringizga suyanch bo'linglar.",
-  "",
-  "To'ylaringiz muborak bo'lsin!",
-  "",
-  "— ukang",
+/* ============ XAT — slaydlar ============
+   h: bo'lim sarlavhasi,  big: katta,  gold: oltin,  author: "muallif" kartasi */
+const SLIDES = [
+  { h:"// 01 — bugun", t:"Assalomu alaykum, akam." },
+  { t:"Bugun to'ying.\nEng uzoq kutilgan kun." },
+  { t:"Seni chin qalbimdan tabriklayman, aka.\nChin yuragimdan baxt tilayman." },
+  { t:"To'yingni telefonda kuzatib o'tirdim.\nSeni kuyov kiyimida ko'rib juda xursand bo'ldim.\nSenga juda yarashibdi." },
+  { t:"To'yingda ukang bo'lib oldingda turishni,\nhammasini o'z ko'zim bilan ko'rishni juda xohlagandim.\nAfsus, bo'lmadi." },
+  { t:"Lekin telefonda bo'lsa ham ko'rganimdan xursandman.\nTo'ying men kutganimdan ham zo'r o'tdi." },
+
+  { h:"// 02 — shu sahifa", t:"Bu sahifani o'zim yasadim.\nHar bir qatorini." },
+  { t:"Lekin bir narsani bilib qo'y..." },
+  { author:true, t:"Buni aslida sen yasagansan.", big:true },
+  { t:"Bugun men Koreyada o'tirib\nshunaqa narsalar yasay olayotgan bo'lsam —\nbunga sen sababchisan." },
+  { t:"Shu kungacha eng ko'p qiyinchilikni sen ko'rding.\nEng og'ir sinovlardan sen o'tding.\nLekin hech qachon taslim bo'lmading." },
+  { t:"Biz uchun qo'lingdan kelganini qilding.\nMeni har doim, har tomonlama qo'llab-quvvatlading.\nHozirgacha ham." },
+  { t:"Shuning uchun bu sahifa —\nfaqat mening sovg'am emas.\nBu sening qilgan mehnatingning natijasi.", big:false },
+
+  { h:"// 03 — sen haqingda", t:"Sendek akam borligidan faxrlanaman.\nKo'p narsada menga o'rnak bo'lgansan." },
+  { t:"Sen men uchun\ndunyodagi eng zo'r akasan.", big:true },
+  { t:"Seni yaxshi ko'raman, akam.\nHammasi uchun rahmat.", big:true, gold:true, slow:true },
+  { t:"Va'da beraman —\ninshaalloh, qilgan yaxshiliklaringning\nrohatini hali ko'rasizlar." },
+
+  { h:"// 04 — ikkovingizga", t:`Akam, ${CONFIG.kelin} ${CONFIG.kelinMurojaat} —\nikkovingizni ham chin yurakdan tabriklayman.` },
+  { t:"Baxtli bo'linglar.\nQo'sha qaringlar." },
+  { t:"Uzoq umr ko'ringlar,\ndoim sog'-salomat bo'linglar." },
+  { t:"Shu kundan keyingi hayotingiz\nfaqat yaxshi kunlar, quvonch va baxtga\nto'la bo'lsin." },
+  { t:"To'ylaringiz muborak bo'lsin!", big:true, gold:true },
 ];
 
 const $ = s => document.querySelector(s);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
 
-/* ---------- bosib turish = tezlashtirish ---------- */
-let holding = false, tapResolver = null;
-addEventListener("pointerdown", () => { holding = true; if (tapResolver) tapResolver(); });
-addEventListener("pointerup", () => holding = false);
-addEventListener("pointercancel", () => holding = false);
-function waitTap(ms){ return new Promise(res => { const t = setTimeout(()=>{ tapResolver=null; res(); }, ms); tapResolver = () => { clearTimeout(t); tapResolver=null; res(); }; }); }
-
-/* ============ OVOZ (WebAudio sintez, fayl yo'q) ============ */
+/* ============ OVOZ (WebAudio sintez) ============ */
 const Snd = {
-  ctx:null, master:null, fx:null, on:false, lastBlip:0, padTimer:null,
+  ctx:null, master:null, fx:null, on:false, padTimer:null,
   init(){
     try{
       const C = window.AudioContext || window.webkitAudioContext; if(!C) return;
@@ -236,8 +207,8 @@ const Snd = {
       this.master = ctx.createGain(); this.master.gain.value = 0;
       const comp = ctx.createDynamicsCompressor(); this.master.connect(comp); comp.connect(ctx.destination);
       const d = ctx.createDelay(1.5); d.delayTime.value = .33;
-      const fb = ctx.createGain(); fb.gain.value = .35;
-      const lp = ctx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value = 2600;
+      const fb = ctx.createGain(); fb.gain.value = .33;
+      const lp = ctx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value = 2400;
       d.connect(lp); lp.connect(fb); fb.connect(d); lp.connect(this.master);
       this.fx = d;
       if (ctx.state === "suspended") ctx.resume();
@@ -257,23 +228,25 @@ const Snd = {
     o.connect(g); g.connect(this.master); if(toFx) g.connect(this.fx);
     o.start(t); o.stop(t+dur+.05);
   },
-  key(v=.09){
+  key(v=.07){
     if(!this.on) return;
-    const c=this.ctx, t=c.currentTime, len=.028, buf=c.createBuffer(1, Math.floor(c.sampleRate*len), c.sampleRate), d=buf.getChannelData(0);
+    const c=this.ctx, t=c.currentTime, len=.026, buf=c.createBuffer(1, Math.floor(c.sampleRate*len), c.sampleRate), d=buf.getChannelData(0);
     for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,3);
     const s=c.createBufferSource(); s.buffer=buf;
-    const f=c.createBiquadFilter(); f.type="bandpass"; f.frequency.value=1800+Math.random()*1600; f.Q.value=1.1;
+    const f=c.createBiquadFilter(); f.type="bandpass"; f.frequency.value=1800+Math.random()*1500; f.Q.value=1.1;
     const g=c.createGain(); g.gain.value=v;
     s.connect(f); f.connect(g); g.connect(this.master); s.start(t);
   },
-  blip(){
+  bell(f=880, v=.08){ this.tone(f,3,v); this.tone(f*2.005,2,v*.3); },
+  low(){ this.tone(73.4,2.6,.2,"sine",false); },
+  sweep(){ // rasm yig'ilayotganda past shovqin
     if(!this.on) return;
-    const now=performance.now(); if(now-this.lastBlip<60) return; this.lastBlip=now;
-    const sc=[587.3,659.3,740,880,987.8,1174.7,1318.5];
-    this.tone(sc[(Math.random()*sc.length)|0], .8, .028);
+    const c=this.ctx, t=c.currentTime, o=c.createOscillator(), g=c.createGain(), f=c.createBiquadFilter();
+    o.type="sawtooth"; o.frequency.setValueAtTime(55,t); o.frequency.linearRampToValueAtTime(110,t+6);
+    f.type="lowpass"; f.frequency.setValueAtTime(200,t); f.frequency.linearRampToValueAtTime(900,t+6);
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(.05,t+1.5); g.gain.linearRampToValueAtTime(0,t+7);
+    o.connect(f); f.connect(g); g.connect(this.master); o.start(t); o.stop(t+7.2);
   },
-  bell(f=880, v=.1){ this.tone(f,3,v); this.tone(f*2.005,2,v*.3); },
-  low(){ this.tone(73.4,2.5,.18,"sine",false); },
   startPad(){
     if(!this.ctx || this.padTimer) return;
     const chords=[[146.83,220,277.18,329.63],[123.47,185,246.94,293.66],[98,146.83,196,246.94],[110,164.81,220,277.18]];
@@ -286,7 +259,7 @@ const Snd = {
         [-5,5].forEach(det=>{
           const o=c.createOscillator(), g=c.createGain();
           o.type=k===0?"sine":"triangle"; o.frequency.value=f; o.detune.value=det;
-          const v = k===0 ? .045 : .014;
+          const v = k===0 ? .045 : .013;
           g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(v,t+3);
           g.gain.setValueAtTime(v,t+dur-3.2); g.gain.linearRampToValueAtTime(0,t+dur);
           o.connect(g); g.connect(lp); o.start(t); o.stop(t+dur+.1);
@@ -302,19 +275,16 @@ $("#snd").addEventListener("pointerdown", e => { e.stopPropagation(); Snd.set(!S
 /* ============ LAYOUT ============ */
 const DPR = Math.min(window.devicePixelRatio || 1, 2);
 const IMG_AR = 964/1280;
-let VW, VH, cell, rect, cols, rows, imgCol0, imgRow0, scrCols, scrRows;
+let VW, VH, cell, rect, cols, rows;
 function layout(){
   VW = innerWidth; VH = innerHeight;
   let w = VW, h = w / IMG_AR;
-  if (h > VH * 0.96) { h = VH * 0.96; w = h * IMG_AR; }
-  cell = Math.max(5, Math.round(w / 74));
+  if (h > VH * 0.94) { h = VH * 0.94; w = h * IMG_AR; }
+  cell = Math.max(4, Math.round(w / 96));
   cols = Math.floor(w / cell); rows = Math.floor(h / cell);
-  w = cols * cell; h = rows * cell;
-  imgCol0 = Math.round(((VW - w) / 2) / cell);
-  imgRow0 = Math.max(0, Math.round(((VH - h) / 2) / cell));
-  rect = { x: imgCol0 * cell, y: imgRow0 * cell, w, h };
-  scrCols = Math.ceil(VW / cell); scrRows = Math.ceil(VH / cell) + 1;
-  for (const id of ["lockCv","colorCv","rainCv"]) {
+  w = cols*cell; h = rows*cell;
+  rect = { x: Math.round((VW - w)/2), y: Math.round((VH - h)/2), w, h };
+  for (const id of ["lockCv","rainCv"]) {
     const c = document.getElementById(id);
     c.width = VW * DPR; c.height = VH * DPR; c.style.width = VW + "px"; c.style.height = VH + "px";
     c.getContext("2d").setTransform(DPR,0,0,DPR,0,0);
@@ -322,10 +292,8 @@ function layout(){
   Object.assign($("#photo").style, { left: rect.x+"px", top: rect.y+"px", width: rect.w+"px", height: rect.h+"px" });
 }
 
-/* ============ RASM → KATAKLAR ============ */
-const RAMP = " .:-=+*o%#@";
-const clamp255 = v => Math.max(0, Math.min(255, Math.round(v)));
-const greenOf = v => `rgb(${Math.round(20+60*v*v)},${Math.round(70+185*v)},${Math.round(40+75*v)})`;
+/* ============ RASM → ASCII ============ */
+const RAMP = " .:-=+*#%@";
 let cells;
 function analyse(img){
   const oc = document.createElement("canvas"); oc.width = cols; oc.height = rows;
@@ -333,10 +301,7 @@ function analyse(img){
   x.drawImage(img, 0, 0, cols, rows);
   let data = null; try { data = x.getImageData(0,0,cols,rows).data; } catch(e){}
   const n = cols*rows, lum = new Float32Array(n); cells = new Array(n);
-  for (let i=0;i<n;i++){
-    const r = data? data[i*4] : 128, g = data? data[i*4+1] : 128, b = data? data[i*4+2] : 128;
-    lum[i] = (0.299*r + 0.587*g + 0.114*b)/255; cells[i] = { r, g, b };
-  }
+  for (let i=0;i<n;i++){ lum[i] = data ? (0.299*data[i*4] + 0.587*data[i*4+1] + 0.114*data[i*4+2])/255 : .5; }
   const sorted = Array.from(lum).sort((a,b)=>a-b);
   const lo = sorted[Math.floor(n*0.02)], hi = sorted[Math.floor(n*0.995)];
   const L = (xx,yy) => lum[Math.min(rows-1,Math.max(0,yy))*cols + Math.min(cols-1,Math.max(0,xx))];
@@ -344,13 +309,11 @@ function analyse(img){
     const i = yy*cols+xx;
     const gx = -L(xx-1,yy-1)-2*L(xx-1,yy)-L(xx-1,yy+1)+L(xx+1,yy-1)+2*L(xx+1,yy)+L(xx+1,yy+1);
     const gy = -L(xx-1,yy-1)-2*L(xx,yy-1)-L(xx+1,yy-1)+L(xx-1,yy+1)+2*L(xx,yy+1)+L(xx+1,yy+1);
-    const edge = Math.min(1, Math.hypot(gx,gy)*1.6);
+    const edge = Math.min(1, Math.hypot(gx,gy)*1.5);
     let v = Math.min(1, Math.max(0, (lum[i]-lo)/(hi-lo||1)));
-    v = Math.min(1, 0.10 + Math.pow(v,1.9)*0.72 + edge*0.75);
-    const c = cells[i]; c.v = v;
-    c.ch = RAMP[Math.min(RAMP.length-1, 1 + Math.floor(v*(RAMP.length-1)))];
-    const avg = (c.r+c.g+c.b)/3, s = 1.2;
-    c.cr = clamp255(avg+(c.r-avg)*s); c.cg = clamp255(avg+(c.g-avg)*s); c.cb = clamp255(avg+(c.b-avg)*s);
+    v = Math.min(1, 0.06 + Math.pow(v,1.7)*0.78 + edge*0.7);
+    cells[i] = { v, ch: RAMP[Math.min(RAMP.length-1, 1 + Math.floor(v*(RAMP.length-1)))],
+                 col: `rgb(${Math.round(15+70*v*v)},${Math.round(60+195*v)},${Math.round(35+80*v)})` };
   }
 }
 
@@ -358,7 +321,7 @@ function analyse(img){
 function startScreen(){
   const lines = [
     `<span class="muted">~/akamga $</span> ls`,
-    `rasm.jpg   akamga.txt   akamga`,
+    `rasm.jpg   xat.txt   akamga`,
     `<span class="muted">~/akamga $</span> cat README`,
     `Kimga: ${esc(CONFIG.aka)} akamga.`,
     `Kimdan: ukangdan.`,
@@ -381,261 +344,234 @@ function startScreen(){
 function row(html, cls="row"){ const d=document.createElement("div"); d.className=cls; d.innerHTML=html; $("#termInner").appendChild(d); return d; }
 async function typeRow(prefixHtml, text, speed=45, cls="row"){
   const d = row(prefixHtml, cls); const t = document.createElement("span"); d.appendChild(t); d.classList.add("cur");
-  for (const ch of text){ t.textContent += ch; if(ch!==" ") Snd.key(.07); await sleep(speed + Math.random()*speed*.7); }
+  for (const ch of text){ t.textContent += ch; if(ch!==" ") Snd.key(.06); await sleep(speed + Math.random()*speed*.6); }
   d.classList.remove("cur"); return d;
 }
 const P = `<span class="p">ukang@seoul</span><span class="t">:</span><span class="h">~/akamga</span><span class="t">$</span> `;
 async function terminal(){
   $("#term").style.opacity = 1;
   await sleep(400);
-  await typeRow(P, "git log --reverse --format='%h  %ad  %s'", 32);
-  await sleep(350);
+  await typeRow(P, "git log", 60);
+  await sleep(400);
   const log = [
-    ["a3f91c0","01:12","boshladim. akamga."],
-    ["5e7d2b4","02:47","matrix yomg'iri"],
-    ["c09e1a7","04:30","kod rasmga yopishadigan qildim"],
-    ["8b14f6e","05:55","fix: yuzlar chiqmayapti"],
-    ["d2a7730","07:20","fix: yuzlar yana"],
-    ["19c4e0b","09:03","oyat"],
-    ["7f0b9d2","11:41","xat, birinchi varianti"],
-    ["e6a3c51","13:26","xatni o'chirdim. qaytadan"],
-    ["b8d09f4","16:12","xat, yana qaytadan"],
-    ["40e7a1c","19:38","telefonda tekshirdim"],
-    ["f1c6e28","22:57","oxirgi tuzatishlar"],
-    ["0d9be33","00:31","tayyor"],
+    ["01:12","boshladim. akamga."],
+    ["02:47","kod yomg'iri"],
+    ["04:30","kod rasmga aylanadigan qildim"],
+    ["05:55","fix: yuzlar aniq chiqmayapti"],
+    ["07:20","fix: yuzlar, yana"],
+    ["09:03","oyat"],
+    ["11:41","xat — birinchi varianti"],
+    ["13:26","xatni o'chirdim. qaytadan"],
+    ["16:12","xat — yana qaytadan"],
+    ["19:38","telefonda tekshirdim"],
+    ["22:57","oxirgi tuzatishlar"],
+    ["00:31","tayyor"],
   ];
-  for (const [h,t,s] of log){ row(`<span class="h">${h}</span>  <span class="t">${t}</span>  ${esc(s)}`); Snd.key(.04); await sleep(110); }
+  for (const [t,s] of log){ row(`<span class="h">${t}</span>  ${esc(s)}`); Snd.key(.04); await sleep(230); }
   await sleep(900);
-  row(`<span class="t">12 commit · 24 soat · 0 soat uyqu</span>`);
-  await sleep(1500);
+  row(`<span class="t">— 24 soat, uyqusiz.</span>`);
+  await sleep(2200);
   await typeRow(P, "./akamga", 70);
   await sleep(700);
-  row(`<span class="t">[ulanish]</span> Koreya → O'zbekiston`); Snd.key(.05);
-  await sleep(700);
-  row(`<span class="t">[masofa]</span>  <span class="w">4 800 km</span>`); Snd.low();
-  await sleep(2000);
-  await typeRow("", "To'yingga borolmadim, aka.", 70, "row big");
-  await sleep(1300);
-  await typeRow("", "Shuning uchun kod bo'lib keldim.", 70, "row big");
-  await sleep(2000);
+  row(`<span class="t">Koreya → O'zbekiston</span>`);
+  await sleep(800);
+  row(`<span class="t">masofa:</span> <span class="w">4 800 km</span>`); Snd.low();
+  await sleep(2200);
+  await typeRow("", "To'yingga borolmadim, aka.", 75, "row big");
+  await sleep(1500);
+  await typeRow("", "Lekin senga bir narsa yasadim.", 75, "row big");
+  await sleep(1800);
+  await typeRow(P, "./render rasm.jpg", 60);
+  await sleep(900);
   $("#term").style.opacity = 0;
-  await sleep(600);
+  await sleep(500);
 }
 
-/* ============ 3) YOMG'IR → RASM ============ */
+/* ============ 3) KOD YOMG'IRI → RASM (tepadan pastga aniq yig'iladi) ============ */
 const RAIN_CHARS = "01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワン0123456789ABCDEFZ<>{}=+*#$%";
 const rc = () => RAIN_CHARS[(Math.random()*RAIN_CHARS.length)|0];
 function rainToImage(){
   const lockX = $("#lockCv").getContext("2d"), rainX = $("#rainCv").getContext("2d");
-  const font = `700 ${Math.round(cell*1.18)}px "JetBrains Mono", ui-monospace, monospace`;
-  lockX.font = rainX.font = font; lockX.textAlign = rainX.textAlign = "center"; lockX.textBaseline = rainX.textBaseline = "middle";
-  const n = cols*rows, locked = new Uint8Array(n);
-  let lockedCount = 0;
-  const faces = [[0.368,0.405],[0.586,0.362]];
-  const weight = new Float32Array(n);
-  for (let r=0;r<rows;r++) for (let c=0;c<cols;c++){
-    let w = 1; for (const [ax,ay] of faces){ const d = Math.hypot(c/cols-ax, (r/rows-ay)*IMG_AR); if (d<0.075) w = Math.min(w, 0.15 + d*4); }
-    weight[r*cols+c] = w;
-  }
-  const settling = [];
-  const lockCell = (i, t) => { locked[i]=1; lockedCount++; settling.push({ i, until: t + 220 + Math.random()*260 }); Snd.blip(); };
-  const drawCell = (i, ch, color) => {
-    const x = rect.x + (i%cols)*cell, y = rect.y + ((i/cols)|0)*cell;
-    lockX.clearRect(x-0.5, y-0.5, cell+1, cell+1); lockX.fillStyle = color; lockX.fillText(ch, x+cell/2, y+cell/2+0.5);
-  };
+  lockX.font = `700 ${Math.round(cell*1.2)}px "JetBrains Mono", ui-monospace, monospace`;
+  lockX.textAlign = "center"; lockX.textBaseline = "middle";
+  const RC = 15; // yomg'ir belgisi o'lchami
+  rainX.font = `500 ${RC}px "JetBrains Mono", ui-monospace, monospace`; rainX.textAlign = "center";
+  const rCols = Math.ceil(VW / RC), rRows = Math.ceil(VH / RC) + 1;
   const drops = [];
-  const spawn = (col, init) => drops.push({ col, y: init ? -Math.random()*scrRows : -Math.random()*12, sp: .28 + Math.random()*.55 });
-  for (let c=0;c<scrCols;c++){ spawn(c,true); spawn(c,true); if (Math.random()<.6) spawn(c,true); }
-  const T0 = performance.now(), RAMP_START = 2600, RAMP_END = 10500, FORCE = 11200, STOP_SPAWN = 12600;
-  let spawning = true, prev = T0, done = false;
+  for (let c=0;c<rCols;c++){ drops.push({ col:c, y: -Math.random()*rRows*1.2, sp: .22 + Math.random()*.4 }); if (Math.random()<.5) drops.push({ col:c, y: -Math.random()*rRows*2, sp: .22 + Math.random()*.4 }); }
+
+  // har bir katak qachon "qotishi" — front tepadan pastga yuradi
+  const RAIN_ONLY = 2600, SWEEP = 5200, n = cols*rows;
+  const order = new Array(n);
+  for (let i=0;i<n;i++){ const r = (i/cols)|0; order[i] = { i, t: RAIN_ONLY + (r/rows)*SWEEP + Math.random()*650, drawn:0 }; }
+  order.sort((a,b)=>a.t-b.t);
+  let ptr = 0; const flick = [];
+  const front = $("#scan");
+  Object.assign(front.style, { left: rect.x+"px", width: rect.w+"px" });
+  const T0 = performance.now(); let prev = T0, swept = false, resolved = false;
+  setTimeout(()=>Snd.sweep(), RAIN_ONLY);
   return new Promise(resolve => {
     function frame(now){
-      const dt = Math.min(50, now - prev) / 16.67; prev = now;
-      const t = now - T0;
-      rainX.globalCompositeOperation = "destination-out"; rainX.fillStyle = "rgba(0,0,0,0.13)"; rainX.fillRect(0,0,VW,VH);
+      const dt = Math.min(50, now - prev)/16.67; prev = now; const t = now - T0;
+      // yomg'ir
+      rainX.globalCompositeOperation = "destination-out"; rainX.fillStyle = "rgba(0,0,0,0.12)"; rainX.fillRect(0,0,VW,VH);
       rainX.globalCompositeOperation = "source-over";
-      let p = 0;
-      if (t > RAMP_START){ const k = Math.min(1,(t-RAMP_START)/(RAMP_END-RAMP_START)); p = 0.015 + 0.55*k*k*(3-2*k); }
-      for (let d = drops.length-1; d >= 0; d--){
-        const dr = drops[d], oldRow = Math.floor(dr.y); dr.y += dr.sp*dt; const newRow = Math.floor(dr.y);
-        for (let rr = oldRow+1; rr <= newRow; rr++){
-          if (rr < 0) continue;
-          const ch = rc(), x = dr.col*cell + cell/2, y = rr*cell + cell/2;
-          rainX.fillStyle = "#2cff6e"; if (rr-1 >= 0) rainX.fillText(dr.lastCh || ch, x, y - cell);
-          rainX.fillStyle = "#e6ffee"; rainX.fillText(ch, x, y); dr.lastCh = ch;
-          const ic = dr.col - imgCol0, ir = rr - imgRow0;
-          if (ic>=0 && ic<cols && ir>=0 && ir<rows){ const i = ir*cols+ic; if (!locked[i] && Math.random() < p*weight[i]) lockCell(i, now); }
+      const stopRain = t > RAIN_ONLY + SWEEP + 600;
+      for (const d of drops){
+        const o = Math.floor(d.y); d.y += d.sp*dt; const nw = Math.floor(d.y);
+        for (let r=o+1; r<=nw; r++){
+          if (r<0) continue;
+          const x = d.col*RC + RC/2, y = r*RC;
+          rainX.fillStyle = "#1fd65f"; if (d.last) rainX.fillText(d.last, x, y-RC);
+          rainX.fillStyle = "#e9ffef"; const ch = rc(); rainX.fillText(ch, x, y); d.last = ch;
         }
-        if (dr.y > scrRows + 2){ drops.splice(d,1); if (spawning) spawn(dr.col,false); }
+        if (d.y > rRows + 1){ if (stopRain) d.dead = true; else { d.y = -Math.random()*8; d.sp = .22 + Math.random()*.4; } }
       }
-      if (t > FORCE && lockedCount < n){
-        const quota = Math.ceil(n*0.012*dt); let made = 0;
-        for (let tries=0; tries<quota*6 && made<quota; tries++){ const i = (Math.random()*n)|0; if (!locked[i] && (weight[i] > .5 || t > FORCE+1300)){ lockCell(i, now); made++; } }
-        if (t > FORCE + 2600) for (let i=0;i<n;i++) if(!locked[i]){ locked[i]=1; lockedCount++; settling.push({i, until: now+200}); }
+      // front chizig'i
+      const fp = (t - RAIN_ONLY)/SWEEP;
+      if (fp > 0 && fp < 1.05){ front.style.opacity = .9; front.style.top = (rect.y + rect.h*Math.min(1,fp)) + "px"; }
+      else if (fp >= 1.05 && !swept){ swept = true; front.style.transition = "opacity .6s"; front.style.opacity = 0; }
+      // qotish
+      while (ptr < n && order[ptr].t <= t){ flick.push({ i: order[ptr].i, until: now + 140 }); ptr++; }
+      for (let k=flick.length-1;k>=0;k--){
+        const f = flick[k], i = f.i, c = cells[i], x = rect.x + (i%cols)*cell, y = rect.y + ((i/cols)|0)*cell;
+        lockX.clearRect(x-.5, y-.5, cell+1, cell+1);
+        if (now >= f.until){ lockX.fillStyle = c.col; lockX.fillText(c.ch, x+cell/2, y+cell/2+.5); flick.splice(k,1); }
+        else { lockX.fillStyle = "#e9ffef"; lockX.fillText(rc(), x+cell/2, y+cell/2+.5); }
       }
-      for (let s = settling.length-1; s>=0; s--){
-        const st = settling[s], c = cells[st.i];
-        if (now >= st.until){ drawCell(st.i, c.ch, greenOf(c.v)); settling.splice(s,1); } else drawCell(st.i, rc(), "#d8ffe4");
-      }
-      if (t > STOP_SPAWN) spawning = false;
-      if (!done && lockedCount >= n && settling.length === 0){ done = true; spawning = false; resolve(); }
-      if (done && (drops.length === 0 || t > STOP_SPAWN + 6000)){
-        const rv = $("#rainCv"); rv.style.transition = "opacity 1.2s"; rv.style.opacity = 0;
-        setTimeout(()=> rainX.clearRect(0,0,VW,VH), 1300); return;
-      }
+      if (!resolved && ptr >= n && flick.length === 0){ resolved = true; resolve(); }
+      if (resolved && drops.every(d=>d.dead)){ rainX.clearRect(0,0,VW,VH); return; }
+      if (resolved && t > RAIN_ONLY + SWEEP + 9000){ $("#rainCv").style.transition="opacity 1s"; $("#rainCv").style.opacity=0; return; }
       requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
   });
 }
 
-async function colorize(){
-  const cx = $("#colorCv").getContext("2d");
-  cx.font = `700 ${Math.round(cell*1.18)}px "JetBrains Mono", ui-monospace, monospace`; cx.textAlign = "center"; cx.textBaseline = "middle";
-  for (let i=0;i<cells.length;i++){
-    const c = cells[i], x = rect.x + (i%cols)*cell, y = rect.y + ((i/cols)|0)*cell;
-    cx.fillStyle = `rgba(${c.cr},${c.cg},${c.cb},0.42)`; cx.fillRect(x, y, cell, cell);
-    cx.fillStyle = `rgb(${clamp255(c.cr*1.1)},${clamp255(c.cg*1.1)},${clamp255(c.cb*1.1)})`;
-    cx.fillText(c.ch === " " ? "." : c.ch, x+cell/2, y+cell/2+0.5);
-  }
-  const cv = $("#colorCv"), scan = $("#scan");
-  cv.style.transition = "none"; cv.style.opacity = 1;
-  Object.assign(scan.style, { left: rect.x+"px", width: rect.w+"px", opacity: 1 });
-  cv.style.webkitMaskSize = cv.style.maskSize = `${rect.w}px ${rect.h}px`;
-  cv.style.webkitMaskPosition = cv.style.maskPosition = `${rect.x}px ${rect.y}px`;
-  cv.style.webkitMaskRepeat = cv.style.maskRepeat = "no-repeat";
-  Snd.bell(587.3,.07);
-  const D = 2600, t0 = performance.now();
+/* ASCII → haqiqiy rasm (pastdan tepaga emas, tepadan pastga skaner) */
+async function revealPhoto(){
+  await sleep(2200);                       // kod rasmni bir oz ko'rsin
+  const ph = $("#photo"), scan = $("#scan");
+  ph.style.transition = "none"; ph.style.opacity = 1;
+  const setMask = pos => { const m = `linear-gradient(to bottom, #000 0%, #000 ${pos}%, transparent ${pos+4}%)`; ph.style.webkitMaskImage = m; ph.style.maskImage = m; };
+  setMask(-5);
+  scan.style.transition = "none"; scan.style.opacity = .9;
+  Snd.bell(587.3,.06);
+  const D = 2400, t0 = performance.now();
   await new Promise(r => (function f(){
-    const p = Math.min(1,(performance.now()-t0)/D), e = p<.5 ? 2*p*p : 1-Math.pow(-2*p+2,2)/2, pos = e*112 - 6;
-    const m = `linear-gradient(to bottom, #000 0%, #000 ${pos}%, transparent ${pos+6}%)`;
-    cv.style.webkitMaskImage = m; cv.style.maskImage = m;
-    scan.style.top = (rect.y + rect.h*Math.min(1,Math.max(0,pos/100))) + "px";
+    const p = Math.min(1,(performance.now()-t0)/D), e = p<.5 ? 2*p*p : 1-Math.pow(-2*p+2,2)/2, pos = e*110 - 5;
+    setMask(pos); scan.style.top = (rect.y + rect.h*Math.max(0,Math.min(1,pos/100))) + "px";
     p<1 ? requestAnimationFrame(f) : r();
   })());
-  scan.style.transition = "opacity .8s"; scan.style.opacity = 0;
-  cv.style.webkitMaskImage = cv.style.maskImage = "none";
-  $("#lockCv").style.transition = "opacity 1.2s"; $("#lockCv").style.opacity = 0;
-  await sleep(600);
-  $("#photo").classList.add("show"); Snd.bell(880,.06);
-  await sleep(1400);
-  cv.style.transition = "opacity 2s"; cv.style.opacity = 0;
-  await sleep(3800);
+  ph.style.webkitMaskImage = ph.style.maskImage = "none";
+  scan.style.transition = "opacity .6s"; scan.style.opacity = 0;
+  $("#lockCv").style.transition = "opacity 1s"; $("#lockCv").style.opacity = 0;
+  await sleep(3200);
 }
 
 /* ============ 4) OYAT ============ */
 async function verse(){
-  const v = $("#verse"); v.style.opacity = 1; Snd.bell(659.3,.07);
-  await sleep(1200); await waitTap(6500);
-  v.style.opacity = 0; await sleep(1200);
+  const v = $("#verse"); v.style.opacity = 1; Snd.bell(659.3,.06);
+  await sleep(7000);
+  v.style.opacity = 0; await sleep(1300);
+  const ph = $("#photo"); ph.style.transition = "opacity 1.2s"; ph.style.opacity = 0;
+  await sleep(1200);
 }
 
-/* ============ 5) XAT — MUHARRIRDA JONLI YOZILADI ============ */
-async function letter(){
-  $("#photo").classList.add("out");
-  await sleep(800);
-  const ed = $("#editor"), code = $("#code"), tab = $("#tab"), stR = $("#stR");
-  code.innerHTML = ""; tab.classList.remove("saved");
-  ed.classList.add("show");
-  await sleep(1300);
-  $("#tapHint").style.opacity = 1; setTimeout(()=> $("#tapHint").style.opacity = 0, 6000);
-  const caret = document.createElement("span"); caret.className = "caret";
-  let lnNo = 0, active = null;
-  const newLine = () => {
-    lnNo++; if (active) active.classList.remove("active");
-    const l = document.createElement("div"); l.className = "ln active";
-    l.innerHTML = `<div class="n">${lnNo}</div><div class="c"></div>`;
-    code.appendChild(l); active = l;
-    const c = l.querySelector(".c"); c.appendChild(caret);
-    return c;
-  };
-  const scroll = () => { code.scrollTop = code.scrollHeight; };
-  const fast = () => holding;
-  for (const para of LETTER){
-    const c = newLine(); scroll();
-    const txt = document.createTextNode(""); c.insertBefore(txt, caret);
-    if (para === "— ukang") c.classList.add("sign");
-    let slow = false;
-    const parts = para.split(/(\[\[[a-z]+(?::\d+)?\]\])/);
-    for (const part of parts){
-      const m = part.match(/^\[\[([a-z]+)(?::(\d+))?\]\]$/);
-      if (m){
-        if (m[1] === "p"){ caret.classList.remove("typing"); await sleep(fast() ? 80 : +m[2]); }
-        else if (m[1] === "slow") slow = true;
-        else if (m[1] === "d"){
-          caret.classList.add("typing");
-          for (let k=0;k<+m[2];k++){ txt.textContent = txt.textContent.slice(0,-1); Snd.key(.06); await sleep(fast()? 10 : 70); }
-        }
-        continue;
-      }
-      caret.classList.add("typing");
-      for (const ch of part){
-        txt.textContent += ch;
-        if (ch !== " ") Snd.key(.075);
-        stR.textContent = `Ln ${lnNo}, Col ${txt.textContent.length+1} · UTF-8`;
-        let d = slow ? 150 + Math.random()*90 : 34 + Math.random()*46;
-        if (".!?".includes(ch)) d += slow ? 300 : 260 + Math.random()*200;
-        else if (",—".includes(ch)) d += 140;
-        if (fast()) d = 6;
-        if (txt.textContent.length % 18 === 0) scroll();
-        await sleep(d);
-      }
+/* ============ 5) XAT — slaydlar, faqat bosilganda o'tadi ============ */
+function slides(){
+  const box = $("#slides"), head = $("#sHead"), text = $("#sText"), card = $("#sCard"), next = $("#sNext"), back = $("#sBack"), num = $("#sNum"), bar = $("#sBarI");
+  box.classList.add("show");
+  let idx = 0, typing = false, skipType = false, token = 0, lastHead = "";
+  // har slayd uchun sarlavhani topamiz
+  const heads = []; SLIDES.forEach((s,i)=>{ if (s.h) lastHead = s.h; heads[i] = lastHead; });
+
+  async function typeInto(el, str, speed, my){
+    for (const ch of str){
+      if (my !== token) return;
+      el.textContent += ch;
+      if (ch !== " " && ch !== "\n") Snd.key(.05);
+      if (skipType) continue;
+      let d = speed + Math.random()*speed*.5;
+      if (ch === "\n") d += 260; else if (".!?".includes(ch)) d += 280; else if (",—".includes(ch)) d += 140;
+      await sleep(d);
     }
-    caret.classList.remove("typing");
-    scroll();
-    await sleep(fast() ? 60 : (para === "" ? 250 : 650));
   }
-  await sleep(1500);
-  // saqlash va yuborish
-  tab.classList.add("saved"); $("#stL").textContent = "ukang@seoul · main · saqlandi";
-  await sleep(1100);
-  const panel = $("#panel"), pb = $("#panelBody"); pb.innerHTML = ""; panel.classList.add("open");
-  await sleep(700); scroll();
-  const prow = h => { const d = document.createElement("div"); d.innerHTML = h; pb.appendChild(d); return d; };
-  const ptype = async (cmd) => { const d = prow(`<span class="p">$</span> `); const s = document.createElement("span"); d.appendChild(s);
-    for (const ch of cmd){ s.textContent += ch; Snd.key(.06); await sleep(38 + Math.random()*30); } };
-  await ptype(`git commit -am "To'ying muborak, aka"`); await sleep(400);
-  prow(`<span class="t">[main 7a1c3e9] To'ying muborak, aka · 1 file changed</span>`); await sleep(900);
-  await ptype(`git push uzbekistan main`); await sleep(500);
-  prow(`<span class="t">Koreya → O'zbekiston · 4 800 km</span>`); await sleep(1300);
-  prow(`<span class="ok">yetkazildi.</span>`); Snd.bell(587.3,.08);
-  await sleep(2600);
-  ed.classList.remove("show");
-  await sleep(1300);
+  async function show(i){
+    const my = ++token, s = SLIDES[i];
+    typing = true; skipType = false;
+    next.classList.remove("on"); back.style.visibility = i > 0 ? "visible" : "hidden";
+    head.textContent = heads[i];
+    num.textContent = `${String(i+1).padStart(2,"0")} / ${SLIDES.length}`;
+    bar.style.width = ((i+1)/SLIDES.length*100) + "%";
+    text.className = (s.big ? "big" : "") + (s.gold ? " gold" : "");
+    text.textContent = "";
+    const caret = document.createElement("span"); caret.className = "caret";
+    card.style.display = "none"; card.innerHTML = "";
+    await sleep(350); if (my !== token) return;
+
+    if (s.author){
+      // muallif kartasi: "ukang" o'chib, akaning ismi yoziladi
+      card.style.display = "block";
+      card.innerHTML = `<div class="f">akamga.html</div><span class="k">muallif</span>: <span class="v" id="auth"></span><span class="caret" style="display:inline-block;width:.5em;height:1.05em;background:var(--green);vertical-align:-0.12em;animation:blink 1s steps(1) infinite"></span>`;
+      const a = card.querySelector("#auth");
+      await typeInto(a, "ukang", 90, my); if (my !== token) return;
+      await sleep(skipType ? 0 : 1400);
+      for (let k=0;k<5;k++){ if (my !== token) return; a.textContent = a.textContent.slice(0,-1); Snd.key(.05); await sleep(skipType ? 0 : 110); }
+      await sleep(skipType ? 0 : 500);
+      a.className = "gold";
+      await typeInto(a, `${CONFIG.aka} akam`, 85, my); if (my !== token) return;
+      Snd.low();
+      await sleep(skipType ? 0 : 900);
+      card.querySelector(".caret")?.remove();
+    }
+    text.appendChild(caret);
+    const tn = document.createTextNode(""); text.insertBefore(tn, caret);
+    await typeInto(tn, s.t, s.slow ? 95 : (s.big ? 60 : 42), my); if (my !== token) return;
+    if (s.big) Snd.bell(s.gold ? 587.3 : 440, .07);
+    typing = false;
+    await sleep(500); if (my !== token) return;
+    next.textContent = i === SLIDES.length-1 ? "yakunlash →" : "davom →";
+    next.classList.add("on");
+  }
+  return new Promise(resolve => {
+    const go = () => {
+      if (typing){ skipType = true; return; }          // birinchi bosish — matnni to'liq chiqaradi
+      if (idx < SLIDES.length-1){ idx++; show(idx); }
+      else { box.classList.remove("show"); resolve(); }
+    };
+    next.onclick = e => { e.stopPropagation(); go(); };
+    back.onclick = e => { e.stopPropagation(); if (idx > 0){ idx--; skipType = true; show(idx).then(()=>{}); } };
+    box.onclick = () => { if (typing) skipType = true; else if (next.classList.contains("on")) go(); };
+    show(0);
+  });
 }
 
 /* ============ 6) YAKUN ============ */
-let bgRainStarted = false;
+let bgRainOn = false;
 function bgRain(){
-  if (bgRainStarted) return; bgRainStarted = true;
-  const cv = $("#bgRain"), x = cv.getContext("2d"), cs = 14;
-  let W, H, colsN, ys;
+  if (bgRainOn) return; bgRainOn = true;
+  const cv = $("#bgRain"), x = cv.getContext("2d"), cs = 14; let W, H, n, ys;
   const fit = () => { W = innerWidth; H = innerHeight; cv.width = W*DPR; cv.height = H*DPR; x.setTransform(DPR,0,0,DPR,0,0);
-    colsN = Math.ceil(W/cs); ys = Array.from({length: colsN}, () => Math.random()*-H/cs); x.font = `${cs}px "JetBrains Mono", monospace`; };
+    n = Math.ceil(W/cs); ys = Array.from({length:n}, () => Math.random()*-H/cs); x.font = `${cs}px "JetBrains Mono", monospace`; };
   fit(); addEventListener("resize", fit);
   let last = 0;
   (function f(t){
-    if (t - last > 55){
-      last = t;
-      x.fillStyle = "rgba(0,0,0,.12)"; x.fillRect(0,0,W,H);
-      x.fillStyle = "#3dff7a";
-      for (let i=0;i<colsN;i++){ x.fillText(rc(), i*cs, ys[i]*cs); ys[i] += 1; if (ys[i]*cs > H && Math.random() > .975) ys[i] = 0; }
-    }
+    if (t - last > 60){ last = t; x.fillStyle = "rgba(0,0,0,.12)"; x.fillRect(0,0,W,H); x.fillStyle = "#3dff7a";
+      for (let i=0;i<n;i++){ x.fillText(rc(), i*cs, ys[i]*cs); ys[i]++; if (ys[i]*cs > H && Math.random() > .975) ys[i] = 0; } }
     requestAnimationFrame(f);
   })(0);
 }
 function finale(){
-  $("#fMeta").textContent = `${CONFIG.sana} · Koreya → O'zbekiston`;
   $("#fNames").innerHTML = `${esc(CONFIG.aka)}<span class="amp">&amp;</span>${esc(CONFIG.kelin)}`;
-  $("#fSign").innerHTML = `<span class="t">// </span>ukang. Koreyadan.`;
-  $("#final").classList.add("show"); $("#final").scrollTop = 0;
-  bgRain();
-  Snd.bell(587.3,.08); setTimeout(()=>Snd.bell(880,.06),900);
+  $("#fSign").textContent = `// ukang · Koreya → O'zbekiston · ${CONFIG.sana}`;
+  $("#final").classList.add("show");
+  bgRain(); Snd.bell(587.3,.07); setTimeout(()=>Snd.bell(880,.05),900);
 }
 $("#replay").addEventListener("click", () => location.reload());
 $("#reread").addEventListener("click", async e => {
-  e.stopPropagation(); $("#final").classList.remove("show"); await sleep(1200);
-  await letter(); finale();
+  e.stopPropagation(); $("#final").classList.remove("show"); await sleep(900);
+  await slides(); finale();
 });
 
 /* ============ ASOSIY OQIM ============ */
@@ -649,9 +585,9 @@ $("#reread").addEventListener("click", async e => {
   layout(); analyse(img);
   await terminal();
   await rainToImage();
-  await colorize();
+  await revealPhoto();
   await verse();
-  await letter();
+  await slides();
   finale();
 })();
 </script>
