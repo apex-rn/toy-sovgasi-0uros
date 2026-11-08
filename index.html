@@ -8,12 +8,8 @@
 <title>akamga</title>
 <meta property="og:type" content="website">
 <meta property="og:title" content="Akam, bu senga. Ukangdan.">
-<meta property="og:description" content="Oxirigacha ko'r.">
+<meta property="og:description" content="Ovoz bilan, oxirigacha ko'r.">
 <meta property="og:url" content="https://apex-rn.github.io/toy-sovgasi-0uros/">
-<meta property="og:image" content="https://apex-rn.github.io/toy-sovgasi-0uros/juftlik.jpg">
-<meta property="og:image:width" content="964">
-<meta property="og:image:height" content="1280">
-<meta name="twitter:card" content="summary_large_image">
 <link rel="preload" href="juftlik.jpg" as="image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -65,7 +61,7 @@
   #sTop{display:flex;justify-content:space-between;align-items:center;padding:calc(16px + env(safe-area-inset-top)) 20px 0;font-size:13px;color:var(--grey);min-height:48px}
   #sHead{color:var(--green2)}
   #sBody{flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 24px;max-width:640px;width:100%;margin:0 auto}
-  #sText{font-size:clamp(21px,5.9vw,28px);line-height:1.6;color:var(--text);white-space:pre-wrap;word-break:break-word;transition:opacity .15s}
+  #sText{font-size:clamp(21px,5.9vw,28px);line-height:1.6;color:var(--text);white-space:pre-wrap;word-break:break-word;text-wrap:pretty;transition:opacity .15s}
   #sText.big{font-size:clamp(28px,8.4vw,44px);font-weight:700;line-height:1.35;color:#fff}
   #sText.big.gold{color:var(--gold)}
   #sText .ghost{color:transparent}
@@ -99,8 +95,6 @@
   #final button{font-family:var(--mono);font-size:14px;color:var(--green);background:transparent;border:1px solid #1d5e33;min-height:46px;padding:0 16px;border-radius:6px;cursor:pointer}
   @media (max-height:480px){ #final .sign{display:none} #final .photo img{height:min(46vh,46dvh)} }
 
-  #snd{position:absolute;top:calc(8px + env(safe-area-inset-top));right:8px;z-index:30;min-height:40px;padding:0 12px;border-radius:4px;
-       border:1px solid #1f3a28;background:rgba(0,0,0,.6);color:var(--gdim);font-family:var(--mono);font-size:12px;cursor:pointer;display:none}
 </style>
 </head>
 <body>
@@ -113,8 +107,7 @@
   <div id="start">
     <div class="lines" id="startLines"></div>
     <div class="btns">
-      <button class="btn" id="goMute">$ ochish <span class="d">(ovozsiz)</span></button>
-      <button class="btn" id="goSound">$ ochish <span class="d">(ovoz bilan)</span></button>
+      <button class="btn" id="goSound">$ ochish</button>
     </div>
   </div>
 
@@ -149,7 +142,6 @@
     </div>
   </div>
 
-  <button id="snd">ovoz: on</button>
 </div>
 
 <noscript>
@@ -178,7 +170,7 @@ const SLIDES = [
   { t:"Sendek akam borligidan faxrlanaman.\nKo'p hollarda menga o'rnak bo'lgansan." },
   { t:"Sen men uchun\ndunyodagi eng zo'r akasan.", big:true, quiet:true },
   { t:"Seni yaxshi ko'raman, akam.\nHammasi uchun rahmat.", big:true, gold:true, slow:true, quiet:true },
-  { t:"Inshaalloh, hali rohatini ko'rasizlar.\nVa'da beraman.", big:true },
+  { t:"Inshaalloh, hali rohatini ko'rasizlar.\nVa'da beraman.", slow:true },
 
   { h:"// 03 — ikkovingizga", t:`Akam, ${CONFIG.kelin} ${CONFIG.kelinMurojaat} —\nikkovingizni ham chin yurakdan tabriklayman.` },
   { t:"Baxtli bo'linglar, qo'sha qaringlar.\nUzoq umr ko'ringlar, sog'-salomat bo'linglar." },
@@ -195,6 +187,7 @@ const Snd = {
   ctx:null, master:null, fx:null, pad:null, on:false, padTimer:null, noise:null, kc:0,
   init(){
     try{
+      try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch(e){}   // iPhone jim rejimda ham chalinsin
       const C = window.AudioContext || window.webkitAudioContext; if(!C) return;
       const ctx = this.ctx = new C();
       this.master = ctx.createGain(); this.master.gain.value = 0;
@@ -204,20 +197,47 @@ const Snd = {
       const lp = ctx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value = 2400;
       d.connect(lp); lp.connect(fb); fb.connect(d); lp.connect(this.master);
       this.fx = d;
-      this.pad = ctx.createGain(); this.pad.gain.value = 1; this.pad.connect(this.master); this.pad.connect(d);
+      this.pad = ctx.createGain(); this.pad.gain.value = .5; this.pad.connect(this.master); this.pad.connect(d);
       const len = Math.floor(ctx.sampleRate*.026); this.noise = ctx.createBuffer(1, len, ctx.sampleRate);
       const nd = this.noise.getChannelData(0); for(let i=0;i<len;i++) nd[i]=(Math.random()*2-1)*Math.pow(1-i/len,3);
-      if (ctx.state === "suspended") ctx.resume();
-      document.addEventListener("visibilitychange", () => { if (!document.hidden && this.ctx.state === "suspended") this.ctx.resume(); });
+      if (ctx.state !== "running") ctx.resume();
+      const wake = () => { if (this.ctx && this.ctx.state !== "running") this.ctx.resume(); };
+      document.addEventListener("visibilitychange", () => { if (!document.hidden) wake(); });
+      document.addEventListener("pointerdown", wake);
     }catch(e){ this.ctx = null; }
   },
   set(on){
     this.on = on && !!this.ctx; if(!this.ctx) return;
-    if(this.ctx.state==="suspended") this.ctx.resume();
-    this.master.gain.setTargetAtTime(this.on ? .9 : 0, this.ctx.currentTime, .3);
-    $("#snd").textContent = "ovoz: " + (this.on ? "on" : "off");
+    if(this.ctx.state!=="running") this.ctx.resume();
+    const t = this.ctx.currentTime, g = this.master.gain;
+    g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(this.on ? .9 : 0, t + 3);   // 3s ichida asta
   },
-  duck(q){ if(this.pad) this.pad.gain.setTargetAtTime(q ? 0 : 1, this.ctx.currentTime, q ? .45 : 1.2); },
+  // fon musiqasi balandligi (0..1), secs ichida silliq o'tadi
+  level(v, secs=1.5){
+    if(!this.pad) return;
+    const t = this.ctx.currentTime, g = this.pad.gain;
+    g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(v, t + secs);
+  },
+  duck(q){ this.level(q ? 0 : .7, q ? 1.2 : 2.5); },
+  // yakun: aylanish to'xtaydi, bitta tinch akkord, keyin juda past fon
+  ending(){
+    if(!this.ctx) return;
+    clearInterval(this.padTimer); this.padTimer = null;
+    this.level(1, 1.5);
+    this.chord([146.83,220,293.66,369.99], 9);
+    setTimeout(()=>{ this.level(.2, 6); this.startPad(); }, 9000);
+  },
+  chord(fr, dur){
+    if(!this.on) return;
+    const c=this.ctx, t=c.currentTime;
+    const lp=c.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=1000; lp.connect(this.pad);
+    fr.forEach((f,k)=>[-4,4].forEach(det=>{
+      const o=c.createOscillator(), g=c.createGain(); o.type=k===0?"sine":"triangle"; o.frequency.value=f; o.detune.value=det;
+      const v = k===0 ? .05 : .016;
+      g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(v,t+2); g.gain.setValueAtTime(v,t+dur-4); g.gain.linearRampToValueAtTime(0,t+dur);
+      o.connect(g); g.connect(lp); o.start(t); o.stop(t+dur+.1);
+    }));
+  },
   tone(freq, dur, vol, type="sine", toFx=true, at=0){
     if(!this.on) return;
     const c=this.ctx, t=c.currentTime+at, o=c.createOscillator(), g=c.createGain();
@@ -267,16 +287,19 @@ const Snd = {
     play(); this.padTimer=setInterval(play,8500);
   }
 };
-$("#snd").addEventListener("pointerdown", e => { e.stopPropagation(); Snd.set(!Snd.on); if(Snd.on) Snd.startPad(); });
 
 /* ============ LAYOUT ============ */
 const lowEnd = (navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory || 8) <= 2;
 const DPR = lowEnd ? 1 : Math.min(window.devicePixelRatio || 1, 2);
 const IMG_AR = 964/1280;
 let VW, VH, cell, rect, cols, rows;
+// Telegram panellari o'zgarganda sahna balandligi moslashadi
+const fitStage = () => { $("#stage").style.height = (window.visualViewport ? visualViewport.height : innerHeight) + "px"; };
+addEventListener("resize", fitStage);
+if (window.visualViewport) visualViewport.addEventListener("resize", fitStage);
 function layout(){
   VW = innerWidth; VH = innerHeight;
-  $("#stage").style.height = VH + "px";
+  fitStage();
   let w = VW, h = w / IMG_AR;
   if (h > VH * 0.94) { h = VH * 0.94; w = h * IMG_AR; }
   cell = Math.max(4, Math.round(w / 96));
@@ -330,12 +353,11 @@ function startScreen(){
   return new Promise(res=>{
     const go = withSound => e => {
       e.stopPropagation();
-      Snd.init(); Snd.set(withSound); $("#snd").style.display="block";
+      Snd.init(); Snd.set(withSound);
       Snd.startPad();
       res();
     };
     $("#goSound").addEventListener("click", go(true), { once:true });
-    $("#goMute").addEventListener("click", go(false), { once:true });
   });
 }
 
@@ -346,7 +368,7 @@ async function typeRow(prefixHtml, text, speed=45, cls="row"){
   for (const ch of text){ t.textContent += ch; if(ch!==" ") Snd.key(.05); await sleep(speed + Math.random()*speed*.6); }
   d.classList.remove("cur"); return d;
 }
-const P = `<span class="p">ukang@koreya</span><span class="t">:</span><span class="h">~/akamga</span><span class="t">$</span> `;
+const P = `<span class="p">ukang@koreya</span><span class="t">:~$</span> `;
 async function terminal(){
   $("#term").style.opacity = 1;
   await sleep(400);
@@ -355,7 +377,7 @@ async function terminal(){
   const log = [
     ["01:12","boshladim"],
     ["04:30","kod rasmga aylanadigan qildim"],
-    ["07:20","fix: yuzlar aniq chiqmayotgandi"],
+    ["07:20","yuzlar aniq chiqmayotgandi, tuzatdim"],
     ["09:03","oyat"],
     ["13:26","xatni o'chirdim. qaytadan"],
     ["19:38","telefonda tekshirdim"],
@@ -401,7 +423,7 @@ function rainToImage(){
   const front = $("#scan");
   Object.assign(front.style, { left: rect.x+"px", width: rect.w+"px", top: "0px" });
   const T0 = performance.now(); let prev = T0, swept = false, resolved = false;
-  setTimeout(()=>Snd.sweep(), RAIN_ONLY);
+  setTimeout(()=>{ Snd.sweep(); Snd.level(1, 5); }, RAIN_ONLY);   // rasm yig'ilganda musiqa ko'tariladi
   return new Promise(resolve => {
     function frame(now){
       const dt = Math.min(50, now - prev)/16.67; prev = now; const t = now - T0;
@@ -462,9 +484,13 @@ async function revealPhoto(){
 
 /* ============ 4) OYAT (tovushsiz) ============ */
 async function verse(){
-  const v = $("#verse"); v.style.opacity = 1;
+  const v = $("#verse");
+  Snd.level(0, 1.2);                 // oyatda musiqa to'liq jim
+  await sleep(600);
+  v.style.opacity = 1;
   await sleep(7000);
   v.style.opacity = 0; await sleep(1300);
+  Snd.level(.7, 2.5);
   const ph = $("#photo"); ph.style.transition = "opacity 1.2s"; ph.style.opacity = 0;
   await sleep(1200);
 }
@@ -510,11 +536,12 @@ function slides(autoDefault = true){
       rafId = requestAnimationFrame(tick);
     })();
   };
-  document.addEventListener("visibilitychange", () => {
+  const onVis = () => {
     if (!deadline) return;
     if (document.hidden) pausedLeft = deadline - performance.now();
     else if (pausedLeft > 0){ deadline = performance.now() + pausedLeft; pausedLeft = 0; }
-  });
+  };
+  document.addEventListener("visibilitychange", onVis);
 
   async function show(i, instant=false){
     const my = ++token, s = SLIDES[i], p = PARSED[i];
@@ -560,7 +587,7 @@ function slides(autoDefault = true){
   function go(){
     if (typing){ skip = true; return; }               // yozilayotganda bosish — matn to'liq chiqadi
     if (idx < SLIDES.length-1){ idx++; show(idx); }
-    else { token++; stopCount(); if (quietOn){ Snd.duck(false); quietOn = false; } box.classList.remove("show"); resolveAll(); }
+    else { token++; stopCount(); document.removeEventListener("visibilitychange", onVis); quietOn = false; box.classList.remove("show"); resolveAll(); }
   }
   return new Promise(resolve => {
     resolveAll = resolve;
@@ -590,12 +617,12 @@ function finale(){
   $("#fNames").innerHTML = `${esc(CONFIG.aka)}<span class="amp">&amp;</span>${esc(CONFIG.kelin)}`;
   $("#fSign").textContent = `// ukang · Koreya → O'zbekiston · ${CONFIG.sana}`;
   $("#final").classList.add("show");
-  bgRain(); Snd.bell(587.3,.07); setTimeout(()=>Snd.bell(880,.05),900);
+  bgRain(); Snd.ending();
 }
 $("#replay").addEventListener("click", () => location.reload());
 $("#reread").addEventListener("click", async e => {
   e.stopPropagation(); $("#final").classList.remove("show"); await sleep(900);
-  await slides(false); finale();                       // qayta o'qishda avtomatik o'tish yo'q
+  Snd.level(.7, 2); await slides(true); finale();
 });
 
 /* ============ ASOSIY OQIM ============ */
