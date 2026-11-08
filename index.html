@@ -83,7 +83,10 @@
   #final{position:absolute;inset:0;z-index:16;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
          padding:calc(18px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom));opacity:0;pointer-events:none;transition:opacity 1.8s;background:#000}
   #final.show{opacity:1;pointer-events:auto}
-  #bgRain{position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:.14;pointer-events:none}
+  #bgRain{position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:.14;pointer-events:none;transition:opacity 2s}
+  #fx{position:absolute;inset:0;width:100%;height:100%;z-index:5;pointer-events:none}
+  #final > *:not(canvas){transition:opacity 1.8s ease}
+  #final.pre > *:not(canvas){opacity:0}
   @media (max-height:600px){ #term{line-height:1.55} #term .big{font-size:19px} }
   #final > *:not(canvas){position:relative;z-index:2}
   #final .photo{border:1px solid #2b3a30;padding:5px;background:#050805}
@@ -133,6 +136,7 @@
 
   <div id="final">
     <canvas id="bgRain"></canvas>
+    <canvas id="fx"></canvas>
     <div class="photo"><img src="juftlik.jpg" alt="Kuyov va kelin"></div>
     <div class="names" id="fNames"></div>
     <div class="sub">To'ylaringiz muborak bo'lsin!</div>
@@ -240,13 +244,112 @@ const Snd = {
     g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(v, t + secs);
   },
   duck(q){ this.level(q ? 0 : .7, q ? 1.2 : 2.5); },
-  // yakun: aylanish to'xtaydi, bitta tinch akkord, keyin juda past fon
+  // yakun: bayram qo'shig'i — D major, 116 BPM. Marimba-ohang melodiya, akkord "stab"lar, bass, yengil kick, doira va shaker (~50s)
   ending(){
-    if(!this.ctx) return;
+    if(!this.ctx || !this.on) return;
     clearInterval(this.padTimer); this.padTimer = null;
-    this.level(1, 1.5);
-    this.chord([146.83,220,293.66,369.99], 9);
-    setTimeout(()=>{ this.level(.2, 6); this.startPad(); }, 9000);
+    clearInterval(this.festTimer);
+    this.level(.18, 2);
+    const c = this.ctx, beat = 60/116, BARS = 24;
+    const bus = c.createGain(); bus.gain.value = 0;
+    const hp = c.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 30;
+    bus.connect(hp); hp.connect(this.master);
+    const send = c.createGain(); send.gain.value = .22; hp.connect(send); send.connect(this.fx);
+    const t0 = c.currentTime + .2;
+    bus.gain.setValueAtTime(0, t0); bus.gain.linearRampToValueAtTime(.95, t0 + 1.2);
+    const N = { C5:554.37, D5:587.33, E5:659.25, Fs5:739.99, G5:783.99, A5:880, B5:987.77, Cs6:1108.73, D6:1174.66 };
+    // har takt: [bass ildizi, akkord notalari, melodiya [[beat, nota, uzunlik]...]]
+    const S = [
+      [73.42, [293.66,369.99,440],  [[0,N.Fs5,1],[1,N.A5,.5],[1.5,N.B5,.5],[2,N.A5,1],[3,N.Fs5,1]]],
+      [55.00, [277.18,329.63,440],  [[0,N.E5,1],[1,N.Fs5,.5],[1.5,N.A5,.5],[2,N.E5,1.5],[3.5,N.C5,.5]]],
+      [61.74, [293.66,369.99,493.88],[[0,N.D5,1],[1,N.Fs5,.5],[1.5,N.B5,.5],[2,N.A5,1],[3,N.Fs5,1]]],
+      [49.00, [293.66,392.00,493.88],[[0,N.G5,1],[1,N.Fs5,1],[2,N.E5,1],[3,N.D5,1]]],
+      [73.42, [293.66,369.99,440],  [[0,N.Fs5,.5],[.5,N.A5,.5],[1,N.D6,1],[2,N.Cs6,.5],[2.5,N.B5,.5],[3,N.A5,1]]],
+      [55.00, [277.18,329.63,440],  [[0,N.Cs6,1],[1,N.B5,.5],[1.5,N.A5,.5],[2,N.E5,2]]],
+      [49.00, [293.66,392.00,493.88],[[0,N.B5,1],[1,N.A5,.5],[1.5,N.G5,.5],[2,N.Fs5,1],[3,N.E5,1]]],
+      [55.00, [277.18,329.63,440],  [[0,N.E5,.5],[.5,N.Fs5,.5],[1,N.A5,1],[2,N.D6,2]]],
+    ];
+    // marimba/qo'ng'iroq tembri (FM): yorqin, quvnoq, yumshoq
+    const mallet = (f, t, d, v=.075) => {
+      const car = c.createOscillator(), mod = c.createOscillator(), mg = c.createGain(), g = c.createGain();
+      car.type = "sine"; car.frequency.value = f; mod.type = "sine"; mod.frequency.value = f*4;
+      mg.gain.setValueAtTime(f*2.2, t); mg.gain.exponentialRampToValueAtTime(f*.05, t+.18);
+      mod.connect(mg); mg.connect(car.frequency);
+      const len = Math.max(.35, d*beat*1.2);
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t+.004); g.gain.exponentialRampToValueAtTime(.0001, t+len);
+      car.connect(g); g.connect(bus); car.start(t); mod.start(t); car.stop(t+len+.05); mod.stop(t+len+.05);
+    };
+    // akkord "stab" (yengil pianino kabi)
+    const stab = (fr, t, v=.022) => fr.forEach(f => {
+      const o = c.createOscillator(), o2 = c.createOscillator(), g = c.createGain(), lp = c.createBiquadFilter();
+      o.type = "triangle"; o.frequency.value = f; o2.type = "sawtooth"; o2.frequency.value = f; o2.detune.value = 7;
+      lp.type = "lowpass"; lp.frequency.setValueAtTime(3200, t); lp.frequency.exponentialRampToValueAtTime(700, t+.25);
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t+.005); g.gain.exponentialRampToValueAtTime(.0001, t+.3);
+      o.connect(lp); o2.connect(lp); lp.connect(g); g.connect(bus); o.start(t); o2.start(t); o.stop(t+.32); o2.stop(t+.32);
+    });
+    const bass = (f, t, d=.5) => {
+      const o = c.createOscillator(), o2 = c.createOscillator(), g = c.createGain(), lp = c.createBiquadFilter();
+      o.type = "sine"; o.frequency.value = f; o2.type = "triangle"; o2.frequency.value = f*2;
+      lp.type = "lowpass"; lp.frequency.value = 500;
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.16, t+.01); g.gain.exponentialRampToValueAtTime(.0001, t+d*beat);
+      o.connect(g); o2.connect(lp); lp.connect(g); g.connect(bus); o.start(t); o2.start(t); o.stop(t+d*beat+.05); o2.stop(t+d*beat+.05);
+    };
+    const kick = t => {
+      const o = c.createOscillator(), g = c.createGain(); o.type = "sine";
+      o.frequency.setValueAtTime(140, t); o.frequency.exponentialRampToValueAtTime(42, t+.12);
+      g.gain.setValueAtTime(.32, t); g.gain.exponentialRampToValueAtTime(.0001, t+.28);
+      o.connect(g); g.connect(bus); o.start(t); o.stop(t+.3);
+    };
+    const noiseHit = (t, freq, q, v, type="bandpass") => {
+      const s = c.createBufferSource(); s.buffer = this.noise;
+      const f = c.createBiquadFilter(); f.type = type; f.frequency.value = freq; f.Q.value = q;
+      const g = c.createGain(); g.gain.value = v;
+      s.connect(f); f.connect(g); g.connect(bus); s.start(t);
+    };
+    let next = 0; const total = BARS*16;        // 16-liklar
+    const sched = () => {
+      const ahead = c.currentTime + .5;
+      while (next < total && t0 + next*beat/4 < ahead){
+        const t = t0 + next*beat/4, b = Math.floor(next/16), s = next % 16, bar = S[b % 8], full = b >= 8, beatPos = s/4;
+        // melodiya
+        for (const [bp, f, d] of bar[2]) if (Math.abs(bp - beatPos) < 1e-6) mallet(f, t, d, full ? .08 : .065);
+        // akkord stab — off-beat'larda
+        if (s % 4 === 2) stab(bar[1], t, full ? .024 : .016);
+        // bass: 1-zarb ildiz, 2.5 da oktava
+        if (s === 0) bass(bar[0], t, 1.2); else if (s === 6 || s === 10) bass(bar[0]*2, t, .45); else if (s === 12) bass(bar[0], t, .8);
+        if (full){
+          if (s === 0 || s === 8) kick(t);
+          if (s === 4 || s === 12) noiseHit(t, 1800, 1.2, .07);            // doira "tak"
+          if (s === 0 || s === 10) noiseHit(t, 220, 2, .06, "lowpass");     // doira "dum"
+          noiseHit(t, 7000, .7, s % 4 === 2 ? .022 : .011, "highpass");     // shaker
+        } else if (b >= 6 && s % 2 === 0){
+          noiseHit(t, 7000, .7, .006 + (b-6)*.004, "highpass");             // kirishda asta shaker
+        }
+        next++;
+      }
+      if (next >= total){
+        clearInterval(this.festTimer); this.festTimer = null;
+        const end = t0 + total*beat/4;
+        // oxirgi D akkord jarangi
+        [293.66,369.99,440,587.33].forEach((f,k)=>mallet(f, end + k*.04, 6, .06));
+        bass(73.42, end, 6);
+        bus.gain.setValueAtTime(.95, end + 1); bus.gain.linearRampToValueAtTime(0, end + 6);
+        setTimeout(()=>{ this.level(.2, 4); this.startPad(); }, Math.max(0, (end + 5 - c.currentTime) * 1000));
+      }
+    };
+    sched(); this.festTimer = setInterval(sched, 100);
+  },
+  // salyut: uzoqdan yumshoq "gup"
+  thump(){
+    if(!this.on) return;
+    const c=this.ctx, t=c.currentTime, o=c.createOscillator(), g=c.createGain();
+    o.type="sine"; o.frequency.setValueAtTime(85,t); o.frequency.exponentialRampToValueAtTime(38,t+.28);
+    g.gain.setValueAtTime(.13,t); g.gain.exponentialRampToValueAtTime(.0001,t+.32);
+    o.connect(g); g.connect(this.master); o.start(t); o.stop(t+.35);
+    const s=c.createBufferSource(); s.buffer=this.noise; s.playbackRate.value=.35;
+    const f=c.createBiquadFilter(); f.type="lowpass"; f.frequency.value=900;
+    const g2=c.createGain(); g2.gain.setValueAtTime(.05,t); g2.gain.exponentialRampToValueAtTime(.0001,t+.5);
+    s.connect(f); f.connect(g2); g2.connect(this.master); s.start(t);
   },
   chord(fr, dur){
     if(!this.on) return;
@@ -634,11 +737,143 @@ function bgRain(){
     requestAnimationFrame(f);
   })(0);
 }
+/* ============ SALYUT + KONFETTI ============
+   Kod raketalari turli tomondan, turli burchakda uchadi va kod belgilariga yorilib portlaydi.
+   Konfetti rasm ustidan ham tushadi. Ranglar: oltin, oq, yashil. */
+const GLYPHS = "{}<>/;=+*#$%&01λπΣ∞[]()";
+const spriteCache = new Map();
+function glyphSprite(ch, col, size){
+  const key = ch + col + size;
+  let s = spriteCache.get(key); if (s) return s;
+  const pad = Math.ceil(size*.9), d = Math.ceil(size + pad*2), cv = document.createElement("canvas");
+  const r = Math.min(DPR, 2); cv.width = d*r; cv.height = d*r;
+  const x = cv.getContext("2d"); x.scale(r, r);
+  x.font = `700 ${size}px "JetBrains Mono", ui-monospace, monospace`; x.textAlign = "center"; x.textBaseline = "middle";
+  x.shadowColor = col; x.shadowBlur = size*.7; x.fillStyle = col; x.fillText(ch, d/2, d/2);
+  x.shadowBlur = 0; x.fillStyle = "#fff"; x.globalAlpha = .55; x.fillText(ch, d/2, d/2);
+  s = { cv, d }; spriteCache.set(key, s); return s;
+}
+let celebrateRun = 0;
+function celebrate(full){
+  const run = ++celebrateRun;
+  const cv = $("#fx"), x = cv.getContext("2d"), dpr = Math.min(DPR, 1.5);
+  const W = innerWidth, H = innerHeight;
+  cv.width = W*dpr; cv.height = H*dpr; x.setTransform(dpr,0,0,dpr,0,0);
+  const K = lowEnd ? .55 : 1, S = Math.min(W, H) / 400;
+  const GOLD = ["#f2cf7e","#ffe7a8","#fff4dc"], GREEN = "#3dff7a", WHITE = "#ffffff";
+  const SIZES = [10, 13, 16].map(v => Math.round(v*Math.max(.9, S)));
+  const rnd = (a, b) => a + Math.random()*(b-a), pick = a => a[(Math.random()*a.length)|0];
+
+  // raketalar jadvali
+  const plan = [];
+  if (full){
+    [0.15,0.55,0.9,1.3,1.75,2.1,2.5,2.9,3.3].forEach(t => plan.push(t));          // qora osmonda kuchli ochilish
+    for (let t = 4.6; t < 19; t += rnd(1.3, 2.3)) plan.push(t);                       // rasm paydo bo'lgach davom etadi
+    [19.2, 19.35, 19.5, 19.8].forEach(t => plan.push(t));                             // yakuniy guldasta
+  } else [0.2, 0.8, 1.5, 2.4].forEach(t => plan.push(t));
+  const rockets = plan.map((t, k) => {
+    const side = Math.random();
+    const sx = side < .33 ? rnd(-.05, .2)*W : side < .66 ? rnd(.8, 1.05)*W : rnd(.3, .7)*W;   // chapdan, o'ngdan, pastdan
+    const tx = rnd(.12, .88)*W, ty = rnd(.08, .42)*H;
+    return { t, sx, sy: H + 20, tx, ty, cx: (sx + tx)/2 + rnd(-.25, .25)*W, cy: rnd(.45, .8)*H,
+             dur: rnd(.7, 1.05), type: pick(["sphere","ring","double","willow","sphere","double"]), trail: [], done: false, loud: k % 2 === 0 };
+  });
+  const parts = [], conf = [];
+  // konfetti to'lqinlari (rasm ustidan ham)
+  const waves = full ? [0.4, 4.4, 9, 14] : [0.3];
+  const confQ = [];
+  waves.forEach((w, i) => { const n = Math.round((i === 0 ? 70 : 45)*K); for (let k=0;k<n;k++) confQ.push(w + Math.random()*2.2); });
+  confQ.sort((a,b)=>a-b); let cq = 0;
+  const CONF = ["#e3c27a","#f0d9a0","#f3ead8","#ffffff","#3dff7a"];
+
+  const burst = r => {
+    if (r.loud) Snd.thump();
+    const n = Math.round((r.type === "ring" ? 46 : r.type === "willow" ? 60 : 72)*K);
+    const base = pick(GOLD);
+    for (let i=0;i<n;i++){
+      let a, sp, col = pick(GOLD), size = pick(SIZES), drag = .983, grav = .03, life = rnd(1.3, 2.1);
+      if (r.type === "ring"){ a = i/n*Math.PI*2; sp = 4.2*S; col = base; }
+      else if (r.type === "double"){ a = Math.random()*Math.PI*2; const inner = i < n*.35; sp = (inner ? rnd(1.2,2.2) : rnd(3.6,4.8))*S; col = inner ? GREEN : pick(GOLD); }
+      else if (r.type === "willow"){ a = Math.random()*Math.PI*2; sp = rnd(1.8, 3.8)*S; drag = .972; grav = .05; life = rnd(2.2, 3); col = "#f2cf7e"; }
+      else { a = Math.random()*Math.PI*2; sp = rnd(1.4, 4.6)*S; if (Math.random() < .12) col = Math.random() < .5 ? GREEN : WHITE; }
+      parts.push({ x: r.tx, y: r.ty, vx: Math.cos(a)*sp, vy: Math.sin(a)*sp, life, max: life, drag, grav, col, size,
+                   ch: GLYPHS[(Math.random()*GLYPHS.length)|0], rot: rnd(-.5,.5), vr: rnd(-.08,.08) });
+    }
+    // markazda qisqa chaqnash
+    parts.push({ flash: true, x: r.tx, y: r.ty, life: .25, max: .25 });
+  };
+
+  const T0 = performance.now(); let prev = T0;
+  (function f(now){
+    if (run !== celebrateRun) return;
+    if (document.hidden){ prev = now; requestAnimationFrame(f); return; }
+    const dt = Math.min(50, now - prev)/16.67, sec = Math.min(50, now - prev)/1000; prev = now;
+    const t = (now - T0)/1000;
+    x.clearRect(0,0,W,H);
+    x.globalCompositeOperation = "lighter";
+    // raketalar — yashil kod izi bilan egri yo'l
+    for (const r of rockets){
+      if (r.done || t < r.t) continue;
+      const p = Math.min(1, (t - r.t)/r.dur), e = 1 - Math.pow(1-p, 2.2), u = 1 - e;
+      const px = u*u*r.sx + 2*u*e*r.cx + e*e*r.tx, py = u*u*r.sy + 2*u*e*r.cy + e*e*r.ty;
+      r.trail.push({ x: px, y: py, ch: Math.random() < .5 ? "1" : "0", a: 1 });
+      for (const s of r.trail){
+        s.a -= .055*dt; if (s.a <= 0) continue;
+        const sp = glyphSprite(s.ch, GREEN, SIZES[0]);
+        x.globalAlpha = s.a*.9; x.drawImage(sp.cv, s.x - sp.d/2, s.y - sp.d/2, sp.d, sp.d);
+      }
+      if (p >= 1){ r.done = true; burst(r); }
+    }
+    // portlash belgilari
+    for (let i = parts.length-1; i >= 0; i--){
+      const q = parts[i];
+      q.life -= sec;
+      if (q.life <= 0){ parts.splice(i,1); continue; }
+      const k = q.life / q.max;
+      if (q.flash){
+        const g = x.createRadialGradient(q.x, q.y, 0, q.x, q.y, 60*S);
+        g.addColorStop(0, `rgba(255,240,200,${.5*k})`); g.addColorStop(1, "rgba(255,240,200,0)");
+        x.globalAlpha = 1; x.fillStyle = g; x.fillRect(q.x - 60*S, q.y - 60*S, 120*S, 120*S); continue;
+      }
+      const dr = Math.pow(q.drag, dt); q.vx *= dr; q.vy = q.vy*dr + q.grav*dt*S;
+      q.x += q.vx*dt; q.y += q.vy*dt; q.rot += q.vr*dt;
+      let a = Math.pow(k, 1.2); if (k < .35 && Math.random() < .35) a *= .2;   // oxirida chirsillab so'nadi
+      const sp = glyphSprite(q.ch, q.col, q.size), sc = .55 + .45*k;
+      x.globalAlpha = a;
+      x.save(); x.translate(q.x, q.y); x.rotate(q.rot); x.scale(sc, sc); x.drawImage(sp.cv, -sp.d/2, -sp.d/2, sp.d, sp.d); x.restore();
+    }
+    // konfetti — oltin folga lentalar, rasm ustidan
+    x.globalCompositeOperation = "source-over";
+    while (cq < confQ.length && confQ[cq] <= t){
+      conf.push({ x: Math.random()*W, y: -14, vy: rnd(1.4, 2.6)*S, ph: Math.random()*6.28, sp: rnd(.08,.18), sw: Math.random()*6.28,
+                  rot: rnd(-.8,.8), col: pick(CONF), w: rnd(3,4.5), h: rnd(8,12) });
+      cq++;
+    }
+    for (let i = conf.length-1; i >= 0; i--){
+      const p = conf[i];
+      p.y += p.vy*dt; p.sw += .035*dt; p.ph += p.sp*dt; p.x += Math.sin(p.sw)*.6*dt;
+      if (p.y > H + 20){ conf.splice(i,1); continue; }
+      const w = p.w*Math.abs(Math.cos(p.ph)) + .7, shade = .7 + .3*Math.abs(Math.cos(p.ph));
+      x.save(); x.translate(p.x, p.y); x.rotate(p.rot + Math.sin(p.sw)*.5);
+      x.globalAlpha = .92*shade; x.fillStyle = p.col; x.fillRect(-w/2, -p.h/2, w, p.h); x.restore();
+    }
+    x.globalAlpha = 1;
+    const busy = rockets.some(r => !r.done) || parts.length || conf.length || cq < confQ.length;
+    if (busy) requestAnimationFrame(f); else { x.clearRect(0,0,W,H); $("#bgRain").style.opacity = .14; }
+  })(T0);
+  $("#bgRain").style.opacity = .06;
+}
+let finaleCount = 0;
 function finale(){
   $("#fNames").innerHTML = `${esc(CONFIG.aka)}<span class="amp">&amp;</span>${esc(CONFIG.kelin)}`;
   $("#fSign").textContent = `// ukang · Koreya → O'zbekiston · ${CONFIG.sana}`;
-  $("#final").classList.add("show");
+  finaleCount++;
+  const first = finaleCount === 1;
+  // avval qora osmonda salyut, keyin rasm va ismlar paydo bo'ladi (salyut yuzlar ustiga tushmaydi)
+  $("#final").classList.add("pre", "show");
   bgRain(); Snd.ending();
+  setTimeout(() => celebrate(first), 400);
+  setTimeout(() => $("#final").classList.remove("pre"), first ? 3900 : 1800);
 }
 $("#replay").addEventListener("click", () => location.reload());
 $("#reread").addEventListener("click", async e => {
