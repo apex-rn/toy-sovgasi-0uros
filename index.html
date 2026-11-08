@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#000000">
-<title>Akajon, to‘ying muborak!</title>
+<title>akamga</title>
 <meta property="og:type" content="website">
-<meta property="og:title" content="Akajon, bu senga… 💚">
-<meta property="og:description" content="Koreyadan, ukangdan. Ovozni yoqib, oxirigacha ko‘r.">
+<meta property="og:title" content="Akam, bu senga. Ukangdan.">
+<meta property="og:description" content="Ovozni yoqib, oxirigacha ko'r.">
 <meta property="og:url" content="https://apex-rn.github.io/toy-sovgasi-0uros/">
 <meta property="og:image" content="https://apex-rn.github.io/toy-sovgasi-0uros/juftlik.jpg">
 <meta property="og:image:width" content="964">
@@ -16,111 +16,101 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=JetBrains+Mono:wght@400;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#000; --green:#3dff7a; --green-dim:#1f8f45; --gold:#e8c46a; --gold-soft:#f6e3a8;
-    --text:#f3f1ea; --muted:#9aa59d;
+    --bg:#000; --green:#3dff7a; --green2:#22c55e; --dim:#1d5e33; --gold:#e3c27a;
+    --ed-bg:#0d1117; --ed-bar:#010409; --ed-line:#6e7681; --ed-text:#e6edf3; --ed-border:#21262d;
     --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
-    --serif:"Lora",Georgia,"Times New Roman",serif;
-    --arabic:"Amiri","Traditional Arabic","Scheherazade New",serif;
+    --arabic:"Amiri","Traditional Arabic",serif;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-  html,body{height:100%;background:var(--bg);color:var(--text);overflow:hidden}
-  body{font-family:var(--serif);-webkit-font-smoothing:antialiased;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+  html,body{height:100%;background:var(--bg);color:var(--ed-text);overflow:hidden}
+  body{font-family:var(--mono);-webkit-font-smoothing:antialiased;touch-action:manipulation}
   #stage{position:fixed;inset:0;height:100dvh;overflow:hidden}
   canvas.layer{position:absolute;left:0;top:0;pointer-events:none}
-  #photo{position:absolute;opacity:0;transition:opacity 2.2s ease, filter 2.4s ease, transform 2.4s ease;transform-origin:50% 40%;pointer-events:none;
-         -webkit-user-drag:none}
+  #photo{position:absolute;opacity:0;transition:opacity 2.2s ease, filter 1.6s ease;pointer-events:none;-webkit-user-drag:none}
   #photo.show{opacity:1}
-  #photo.breathe{animation:breathe 14s ease-in-out infinite alternate}
-  #photo.dim{filter:blur(7px) brightness(.28) saturate(.8);transform:scale(1.06);animation:none}
-  @keyframes breathe{from{transform:scale(1)}to{transform:scale(1.035)}}
-  #colorCv{transition:opacity 1.8s ease}
-  #scan{position:absolute;height:2px;background:linear-gradient(90deg,transparent,var(--gold-soft),transparent);
-        box-shadow:0 0 18px 4px rgba(232,196,106,.55);opacity:0;pointer-events:none}
+  #photo.out{opacity:0;filter:brightness(.2)}
+  #scan{position:absolute;height:2px;background:linear-gradient(90deg,transparent,#c9ffd9,transparent);
+        box-shadow:0 0 16px 3px rgba(61,255,122,.5);opacity:0;pointer-events:none}
 
-  /* ---------- start ---------- */
-  #start{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 22px;gap:28px;
-         font-family:var(--mono);color:var(--green);z-index:20;transition:opacity .8s}
-  #start .lines{font-size:15px;line-height:1.9;max-width:520px;margin:0 auto;width:100%;text-shadow:0 0 8px rgba(61,255,122,.45)}
-  #start .lines div{opacity:0;animation:fadeIn .5s forwards}
-  .btns{display:flex;flex-direction:column;gap:12px;max-width:520px;margin:0 auto;width:100%;opacity:0;animation:fadeIn .8s 2.6s forwards}
-  .btn{font-family:var(--mono);font-size:16px;padding:16px 18px;border-radius:12px;border:1px solid var(--green);background:rgba(61,255,122,.08);
-       color:var(--green);cursor:pointer;text-align:left;box-shadow:0 0 22px rgba(61,255,122,.18) inset}
-  .btn.primary{animation:pulse 2.2s ease-in-out infinite}
-  .btn.ghost{border-color:#1d4d2c;background:transparent;color:var(--green-dim);font-size:14px;padding:12px 18px;box-shadow:none}
-  @keyframes pulse{50%{box-shadow:0 0 30px rgba(61,255,122,.35) inset,0 0 26px rgba(61,255,122,.25)}}
-  .cursor::after{content:"▌";animation:blink 1s steps(1) infinite;margin-left:2px}
+  /* start */
+  #start{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 22px;gap:30px;
+         color:var(--green);z-index:20;transition:opacity .6s}
+  #start .lines{font-size:15px;line-height:1.9;max-width:520px;margin:0 auto;width:100%}
+  #start .lines div{opacity:0;animation:fadeIn .25s forwards}
+  #start .muted{color:#3f7a52}
+  .btns{display:flex;flex-direction:column;gap:12px;max-width:520px;margin:0 auto;width:100%;opacity:0;animation:fadeIn .5s 1.6s forwards}
+  .btn{font-family:var(--mono);font-size:15px;padding:15px 16px;border-radius:6px;border:1px solid var(--green2);background:transparent;
+       color:var(--green);cursor:pointer;text-align:left}
+  .btn:active{background:rgba(61,255,122,.12)}
+  .btn.ghost{border-color:#1b3a26;color:#3f7a52;font-size:13px;padding:12px 16px}
+  .cur::after{content:"█";animation:blink 1s steps(1) infinite;margin-left:1px;color:var(--green)}
   @keyframes blink{50%{opacity:0}}
   @keyframes fadeIn{to{opacity:1}}
 
-  /* ---------- terminal ---------- */
-  #term{position:absolute;inset:0;padding:0 20px;display:flex;flex-direction:column;justify-content:center;font-family:var(--mono);
-        color:var(--green);font-size:15px;line-height:1.85;z-index:12;opacity:0;transition:opacity .9s;pointer-events:none}
-  #term .inner{max-width:560px;margin:0 auto;width:100%;text-shadow:0 0 8px rgba(61,255,122,.5)}
-  #term .w{color:#d7ffe2} #term .g{color:var(--gold);text-shadow:0 0 10px rgba(232,196,106,.6)}
-  #term .big{font-size:30px;font-weight:700;letter-spacing:1px}
+  /* terminal */
+  #term{position:absolute;inset:0;padding:calc(24px + env(safe-area-inset-top)) 16px 24px;display:flex;flex-direction:column;justify-content:flex-end;
+        color:#c9d1d9;font-size:13px;line-height:1.7;z-index:12;opacity:0;transition:opacity .7s;pointer-events:none;overflow:hidden}
+  #term .inner{max-width:640px;margin:0 auto;width:100%}
+  #term .p{color:var(--green)} #term .h{color:#e3b341} #term .t{color:#6e7681} #term .w{color:#fff}
+  #term .big{font-size:17px;color:#fff;margin-top:4px}
+  #term .row{white-space:pre-wrap;word-break:break-word}
 
-  /* ---------- verse ---------- */
+  /* verse */
   #verse{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
-         padding:0 20px;z-index:13;opacity:0;transition:opacity 1.6s;pointer-events:none;
-         background:radial-gradient(ellipse at 50% 50%,rgba(0,0,0,.72) 0%,rgba(0,0,0,.45) 55%,rgba(0,0,0,0) 85%)}
-  #verse .ar{font-family:var(--arabic);font-size:clamp(40px,11vw,74px);color:var(--gold);direction:rtl;line-height:1.6;
-             text-shadow:0 0 24px rgba(232,196,106,.55),0 2px 2px rgba(0,0,0,.6)}
-  #verse .tr{font-family:var(--serif);font-style:italic;font-size:clamp(18px,4.8vw,24px);color:var(--gold-soft);margin-top:10px}
-  #verse .ref{font-size:13px;color:var(--muted);margin-top:8px;letter-spacing:2px}
-  #verse .orn{width:min(260px,60vw);height:22px;margin:16px auto}
+         padding:0 20px;z-index:13;opacity:0;transition:opacity 1.4s;pointer-events:none;background:rgba(0,0,0,.78)}
+  #verse .ar{font-family:var(--arabic);font-size:clamp(40px,11vw,72px);color:var(--gold);direction:rtl;line-height:1.7}
+  #verse .tr{font-family:var(--mono);font-size:clamp(17px,4.6vw,22px);color:#fff;margin-top:14px;line-height:1.5}
+  #verse .ref{font-size:12px;color:#8b949e;margin-top:10px;letter-spacing:1px}
 
-  /* ---------- message ---------- */
-  #msg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:14;padding:0 26px;opacity:0;transition:opacity 1s}
-  #msg .box{max-width:600px;width:100%;text-align:center;font-size:clamp(21px,5.6vw,30px);line-height:1.55;color:var(--text);
-            text-shadow:0 2px 14px rgba(0,0,0,.9)}
-  #msg .box .w{display:inline-block;opacity:0;filter:blur(8px);transform:translateY(10px);animation:wordIn .9s cubic-bezier(.2,.7,.2,1) forwards;white-space:pre}
-  #msg .box.climax{font-size:clamp(34px,10vw,58px);color:var(--gold-soft);font-weight:600;text-shadow:0 0 30px rgba(232,196,106,.45),0 2px 10px #000}
-  #msg .box.climax .w{animation-duration:1.8s}
-  #msg .box.soft{color:#cfd6d0;font-style:italic}
-  #msg .box.dua{color:var(--gold-soft)}
-  #msg .box .heart{display:block;font-size:.9em;margin-top:14px;animation:beat 1.4s ease-in-out infinite;opacity:0;animation:fadeIn 1.2s 1.6s forwards, beat 1.4s 2.8s ease-in-out infinite}
-  @keyframes wordIn{to{opacity:1;filter:blur(0);transform:none}}
-  @keyframes beat{0%,100%{transform:scale(1)}15%{transform:scale(1.18)}30%{transform:scale(1)}45%{transform:scale(1.12)}}
-  #prog{position:absolute;left:0;bottom:0;height:3px;background:linear-gradient(90deg,var(--green-dim),var(--gold));width:0;z-index:15;transition:width .8s ease}
-  #hint{position:absolute;bottom:calc(18px + env(safe-area-inset-bottom));left:0;right:0;text-align:center;font-family:var(--mono);font-size:12px;
-        color:#5d6b61;z-index:15;opacity:0;transition:opacity 1s;pointer-events:none}
+  /* editor */
+  #editor{position:absolute;inset:0;z-index:14;display:flex;flex-direction:column;background:var(--ed-bg);opacity:0;transition:opacity 1.2s;pointer-events:none}
+  #editor.show{opacity:1;pointer-events:auto}
+  .tabbar{display:flex;align-items:flex-end;height:calc(38px + env(safe-area-inset-top));padding-top:env(safe-area-inset-top);background:var(--ed-bar);border-bottom:1px solid var(--ed-border)}
+  .tab{font-size:12.5px;color:#e6edf3;padding:10px 16px;background:var(--ed-bg);border-top:2px solid var(--green2);border-right:1px solid var(--ed-border)}
+  .tab .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#c9d1d9;margin-left:10px;vertical-align:middle}
+  .tab.saved .dot{background:transparent;border:1px solid #6e7681}
+  .tab2{font-size:12.5px;color:#6e7681;padding:10px 14px}
+  #code{flex:1;overflow-y:auto;padding:16px 14px 40px 0;font-size:15.5px;line-height:1.7;-webkit-overflow-scrolling:touch}
+  .ln{display:grid;grid-template-columns:38px 1fr;gap:12px}
+  .ln .n{color:var(--ed-line);text-align:right;font-size:12px;padding-top:3px;user-select:none}
+  .ln .c{white-space:pre-wrap;word-break:break-word;color:var(--ed-text);min-height:1.7em}
+  .ln.active{background:rgba(110,118,129,.08)}
+  .ln.active .n{color:#e6edf3}
+  .ln .c.sign{color:#7ee787}
+  .caret{display:inline-block;width:.55em;height:1.15em;background:#e6edf3;vertical-align:text-bottom;animation:blink 1.05s steps(1) infinite;margin-left:1px}
+  .caret.typing{animation:none}
+  #panel{height:0;overflow:hidden;background:var(--ed-bar);border-top:1px solid var(--ed-border);transition:height .6s ease;font-size:12.5px;line-height:1.75;color:#c9d1d9}
+  #panel.open{height:230px}
+  #panel .head{font-size:11px;color:#8b949e;padding:7px 14px;border-bottom:1px solid var(--ed-border);letter-spacing:1px}
+  #panel .body{padding:8px 14px}
+  #panel .p{color:var(--green)} #panel .ok{color:#7ee787} #panel .t{color:#6e7681}
+  .status{display:flex;justify-content:space-between;gap:10px;font-size:11px;color:#c9d1d9;background:#0f2a19;padding:4px 12px calc(4px + env(safe-area-inset-bottom));white-space:nowrap;overflow:hidden}
+  .status span{overflow:hidden;text-overflow:ellipsis}
+  #tapHint{position:absolute;right:12px;bottom:calc(34px + env(safe-area-inset-bottom));font-size:11px;color:#484f58;z-index:15;opacity:0;transition:opacity 1s;pointer-events:none}
 
-  /* ---------- final ---------- */
-  #final{position:absolute;inset:0;z-index:16;overflow-y:auto;-webkit-overflow-scrolling:touch;opacity:0;pointer-events:none;transition:opacity 2s;
-         background:radial-gradient(ellipse at 50% 0%,#0b1a10 0%,#000 60%)}
+  /* final */
+  #final{position:absolute;inset:0;z-index:16;overflow-y:auto;-webkit-overflow-scrolling:touch;opacity:0;pointer-events:none;transition:opacity 1.8s;background:#000}
   #final.show{opacity:1;pointer-events:auto}
-  #final .wrap{max-width:560px;margin:0 auto;padding:34px 20px calc(60px + env(safe-area-inset-bottom));text-align:center;position:relative;z-index:2}
-  #final .date{font-family:var(--mono);color:var(--green);font-size:13px;letter-spacing:3px;opacity:.8}
-  #final .frame{margin:18px auto 0;width:min(100%,420px);padding:10px;border-radius:22px;
-         background:linear-gradient(135deg,#7a5c1e,#f6e3a8 30%,#b48a35 55%,#f6e3a8 80%,#7a5c1e);
-         box-shadow:0 0 50px rgba(232,196,106,.25),0 0 120px rgba(61,255,122,.08)}
-  #final .frame img{display:block;width:100%;border-radius:14px}
-  #final .names{white-space:nowrap;font-family:var(--serif);font-size:clamp(23px,7vw,46px);color:var(--gold-soft);margin-top:26px;font-weight:600;line-height:1.25;
-         text-shadow:0 0 26px rgba(232,196,106,.35)}
-  #final .names .amp{color:var(--green);font-size:.7em;display:inline-block;margin:0 10px;animation:beat 1.6s ease-in-out infinite}
-  #final .sub{font-style:italic;color:#d9d3c2;font-size:20px;margin-top:6px}
-  #final .ar{font-family:var(--arabic);direction:rtl;color:var(--gold);font-size:clamp(23px,6.4vw,32px);line-height:1.9;margin-top:30px}
-  #final .artr{color:#b9b4a6;font-size:16px;font-style:italic;margin-top:6px;line-height:1.6}
-  #final .orn{width:200px;height:20px;margin:28px auto 0;display:block}
-  #final .sign{margin-top:26px;font-size:21px;line-height:1.7;color:var(--text)}
-  #final .sign b{color:var(--gold-soft);font-weight:600}
-  #final .from{font-family:var(--mono);color:var(--green);font-size:13px;margin-top:6px;opacity:.85}
-  .log{margin:34px auto 0;text-align:left;font-family:var(--mono);font-size:12.5px;line-height:1.85;color:#8fd9a6;
-       border:1px solid #173d24;border-radius:12px;padding:14px 16px;background:rgba(10,30,16,.55);max-width:420px}
-  .log .h{color:var(--green);margin-bottom:4px}
-  .log .k{color:#5f8f6d}
-  .log .ok{color:var(--gold)}
-  #replay{margin-top:28px;font-family:var(--mono);font-size:15px;color:var(--green);background:transparent;border:1px solid #1f5a33;
-          padding:13px 22px;border-radius:999px;cursor:pointer}
-  #particles{position:fixed;inset:0;z-index:1;pointer-events:none}
+  #bgRain{position:fixed;inset:0;z-index:0;opacity:.16;pointer-events:none}
+  #final .wrap{position:relative;z-index:2;max-width:520px;margin:0 auto;padding:calc(30px + env(safe-area-inset-top)) 18px calc(56px + env(safe-area-inset-bottom));text-align:center}
+  #final .meta{font-size:11.5px;color:#3f7a52;letter-spacing:1px}
+  #final .photo{margin:16px auto 0;width:min(100%,420px);border:1px solid #2b3a30;padding:6px;background:#050805}
+  #final .photo img{display:block;width:100%}
+  #final .names{font-size:clamp(22px,6.6vw,34px);color:#fff;margin-top:24px;font-weight:700;letter-spacing:.5px;white-space:nowrap}
+  #final .names .amp{color:var(--green);font-weight:400;margin:0 .35em}
+  #final .sub{font-size:16px;color:#c9d1d9;margin-top:8px}
+  #final .ar{font-family:var(--arabic);direction:rtl;color:var(--gold);font-size:clamp(22px,6.2vw,30px);line-height:1.9;margin-top:30px}
+  #final .artr{color:#c9d1d9;font-size:13.5px;margin-top:6px;line-height:1.7}
+  #final .sign{margin-top:34px;font-size:15px;color:#7ee787;line-height:1.7}
+  #final .sign .t{color:#6e7681}
+  #final .acts{display:flex;gap:10px;justify-content:center;margin-top:28px;flex-wrap:wrap}
+  #final button{font-family:var(--mono);font-size:13px;color:var(--green);background:transparent;border:1px solid #1d5e33;padding:11px 16px;border-radius:6px;cursor:pointer}
 
-  #snd{position:absolute;top:calc(12px + env(safe-area-inset-top));right:12px;z-index:30;width:42px;height:42px;border-radius:50%;
-       border:1px solid #1f4a2c;background:rgba(0,0,0,.55);color:var(--green);font-size:18px;cursor:pointer;display:none}
-  #skipVerse{display:none}
-  @media (prefers-reduced-motion: reduce){ #photo.breathe{animation:none} }
+  #snd{position:absolute;top:calc(10px + env(safe-area-inset-top));right:10px;z-index:30;height:30px;padding:0 10px;border-radius:4px;
+       border:1px solid #1f3a28;background:rgba(0,0,0,.6);color:#3f7a52;font-family:var(--mono);font-size:11px;cursor:pointer;display:none}
 </style>
 </head>
 <body>
@@ -134,7 +124,7 @@
   <div id="start">
     <div class="lines" id="startLines"></div>
     <div class="btns">
-      <button class="btn primary" id="goSound">▶ Ochish — ovoz bilan <span style="opacity:.6">(tavsiya)</span></button>
+      <button class="btn" id="goSound">$ ./akamga <span style="color:#3f7a52">  ← ochish (ovoz bilan)</span></button>
       <button class="btn ghost" id="goMute">ovozsiz ochish</button>
     </div>
   </div>
@@ -143,76 +133,100 @@
 
   <div id="verse">
     <div class="ar">وَخَلَقْنَاكُمْ أَزْوَاجًا</div>
-    <svg class="orn" viewBox="0 0 260 22" fill="none" stroke="#e8c46a" stroke-width="1.2"><path d="M0 11h100M160 11h100"/><path d="M130 2l9 9-9 9-9-9z"/><circle cx="110" cy="11" r="2.5"/><circle cx="150" cy="11" r="2.5"/></svg>
     <div class="tr">«Va sizlarni juft qilib yaratdik»</div>
-    <div class="ref">NABA SURASI · 8-OYAT</div>
+    <div class="ref">Naba surasi, 8-oyat</div>
   </div>
 
-  <div id="msg"><div class="box" id="msgBox"></div></div>
-  <div id="prog"></div>
-  <div id="hint">ekranga bosing — keyingisi ›</div>
+  <div id="editor">
+    <div class="tabbar"><div class="tab" id="tab">akamga.txt<span class="dot"></span></div><div class="tab2">rasm.jpg</div></div>
+    <div id="code"></div>
+    <div id="panel"><div class="head">TERMINAL</div><div class="body" id="panelBody"></div></div>
+    <div class="status"><span id="stL">ukang@seoul · main</span><span id="stR">Ln 1, Col 1 · UTF-8</span></div>
+  </div>
+  <div id="tapHint">bosib tursang — tezroq</div>
 
   <div id="final">
-    <canvas id="particles"></canvas>
+    <canvas id="bgRain"></canvas>
     <div class="wrap">
-      <div class="date" id="fDate"></div>
-      <div class="frame"><img src="juftlik.jpg" alt="Kuyov va kelin"></div>
+      <div class="meta" id="fMeta"></div>
+      <div class="photo"><img src="juftlik.jpg" alt="Kuyov va kelin"></div>
       <div class="names" id="fNames"></div>
-      <div class="sub">Qo‘sha qaringlar</div>
+      <div class="sub">To'ylaringiz muborak bo'lsin!</div>
       <div class="ar">بَارَكَ اللَّهُ لَكَ، وَبَارَكَ عَلَيْكَ، وَجَمَعَ بَيْنَكُمَا فِي خَيْرٍ</div>
-      <div class="artr">«Alloh senga baraka bersin, ustingga barakasini yog‘dirsin<br>va ikkovingizni yaxshilikda jamlasin»</div>
-      <svg class="orn" viewBox="0 0 200 20" fill="none" stroke="#e8c46a" stroke-width="1.2"><path d="M0 10h75M125 10h75"/><path d="M100 2c-6 0-8 8 0 14 8-6 6-14 0-14z"/><circle cx="85" cy="10" r="2"/><circle cx="115" cy="10" r="2"/></svg>
+      <div class="artr">Alloh senga baraka bersin, ustingga baraka yog'dirsin<br>va ikkovingizni yaxshilikda jamlasin.</div>
       <div class="sign" id="fSign"></div>
-      <div class="from">Koreya → O‘zbekiston · butun yurakdan</div>
-      <div class="log" id="fLog"></div>
-      <button id="replay">↺ qaytadan ko‘rish</button>
+      <div class="acts">
+        <button id="reread">xatni qayta o'qish</button>
+        <button id="replay">boshidan</button>
+      </div>
     </div>
   </div>
 
-  <button id="snd" aria-label="Ovoz">🔊</button>
+  <button id="snd">ovoz: on</button>
 </div>
 
 <noscript>
-  <div style="position:fixed;inset:0;overflow:auto;background:#000;color:#eee;padding:20px;text-align:center;font-family:Georgia,serif">
-    <img src="juftlik.jpg" alt="" style="max-width:100%;border-radius:12px"><h1 style="color:#e8c46a">To‘ying muborak, akajon!</h1>
-    <p>Qo‘sha qaringlar. Seni yaxshi ko‘raman. — ukang</p>
+  <div style="position:fixed;inset:0;overflow:auto;background:#000;color:#eee;padding:20px;text-align:center;font-family:monospace">
+    <img src="juftlik.jpg" alt="" style="max-width:100%"><h2>To'ying muborak, akam!</h2><p>— ukang</p>
   </div>
 </noscript>
 
 <script>
-/* =====================================================================
-   SOZLAMALAR — faqat shu yerni o‘zgartiring
-   ===================================================================== */
+/* ============ SOZLAMALAR ============ */
 const CONFIG = {
-  aka:   "Muhammadrizo",
+  aka: "Muhammadrizo",
   kelin: "Rano",
-  uka:   "",            // sizning ismingiz (ixtiyoriy)
   kelinMurojaat: "kennayam",
-  sana:  "09.11.2026",
+  sana: "09.11.2026",
 };
-/* ===================================================================== */
+
+/* ============ XAT (uka tilidan) ============
+   [[p:ms]] — to'xtab o'ylash,  [[d:N]] — N ta harfni o'chirish,  [[slow]] — sekin yozish */
+const LETTER = [
+  "Assalomu alaykum, akam.",
+  "",
+  "Bugun to'ying. Eng uzoq kutilgan kun.[[p:500]] Seni chin qalbimdan tabriklayman, aka. Chin yuragimdan baxt tilayman.",
+  "",
+  "Bugun seni kuyov kiyimida ko'rdim. Juda xursand bo'ldim. Senga juda yarasharkan, aka.[[p:800]] Rostdan.",
+  "",
+  "To'yingda ukang bo'lib oldingda turishni, to'yingni o'z ko'zim bilan ko'rishni juda xohlagandim.[[p:1000]] Lekin bo'lmadi.",
+  "Yoningda bo'lolmaganim uchun meni kechir, aka.",
+  "Telefonda bo'lsa ham ko'rdim. Shunga ham xursandman. To'ying zo'r o'tyapti, men kutganimdan ham yaxshi.",
+  "",
+  "Aslida senga aytadigan gapim ko'p.[[p:700]] Lekin [[p:600]][[d:6]]Yuzma-yuz hech qachon aytolmasdim. Shuning uchun shu yerga yozyapman.",
+  "",
+  "Shu kungacha eng ko'p qiyinchilikni sen ko'rding. Eng og'ir sinovlardan sen o'tding. Lekin hech qachon taslim bo'lmading.",
+  "Biz uchun qo'lingdan kelgan hamma narsani qilding. Meni doim, har tomonlama qo'llab-quvvatlading. Hozirgacha ham.",
+  "Men hammasini ko'rib turardim, aka.[[p:900]] Hech qachon unutmayman.",
+  "",
+  "Sendek akam borligidan faxrlanaman. Ko'p narsada menga o'rnak bo'lgansan.",
+  "Sen men uchun dunyodagi eng zo'r akasan.",
+  "",
+  "[[p:1200]][[slow]]Seni yaxshi ko'raman, akam.[[p:1600]]",
+  "Hammasi uchun rahmat.",
+  "Va'da beraman — inshaalloh, hali hammasining rohatini ko'rasizlar.",
+  "",
+  `Akam, ${CONFIG.kelin} ${CONFIG.kelinMurojaat} — ikkovingizni ham chin yurakdan tabriklayman.`,
+  "Baxtli bo'linglar, qo'sha qaringlar. Uzoq umr ko'ringlar, doim sog'-salomat bo'linglar.",
+  "Shu kundan keyingi hayotingiz faqat yaxshi kunlar, quvonch va baxtga to'la bo'lsin. Bir-biringizga suyanch bo'linglar.",
+  "",
+  "To'ylaringiz muborak bo'lsin!",
+  "",
+  "— ukang",
+];
 
 const $ = s => document.querySelector(s);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-const AKA_NAME   = CONFIG.aka   || "Akam";
-const KELIN_NAME = CONFIG.kelin || "Yangam";
-const kelinHitob = CONFIG.kelin ? `${CONFIG.kelin} ${CONFIG.kelinMurojaat}` : (CONFIG.kelinMurojaat.charAt(0).toUpperCase()+CONFIG.kelinMurojaat.slice(1));
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
 
-/* ---------------- tap-to-advance ---------------- */
-let advanceResolver = null;
-function waitTap(ms){
-  return new Promise(res => {
-    let done = false;
-    const fin = () => { if(done) return; done = true; advanceResolver = null; clearTimeout(t); res(); };
-    const t = setTimeout(fin, ms);
-    advanceResolver = fin;
-  });
-}
-document.addEventListener("pointerdown", () => { if (advanceResolver) advanceResolver(); });
+/* ---------- bosib turish = tezlashtirish ---------- */
+let holding = false, tapResolver = null;
+addEventListener("pointerdown", () => { holding = true; if (tapResolver) tapResolver(); });
+addEventListener("pointerup", () => holding = false);
+addEventListener("pointercancel", () => holding = false);
+function waitTap(ms){ return new Promise(res => { const t = setTimeout(()=>{ tapResolver=null; res(); }, ms); tapResolver = () => { clearTimeout(t); tapResolver=null; res(); }; }); }
 
-/* =====================================================================
-   OVOZ — hammasi WebAudio bilan sintez qilingan (fayl yo‘q)
-   ===================================================================== */
+/* ============ OVOZ (WebAudio sintez, fayl yo'q) ============ */
 const Snd = {
   ctx:null, master:null, fx:null, on:false, lastBlip:0, padTimer:null,
   init(){
@@ -220,23 +234,20 @@ const Snd = {
       const C = window.AudioContext || window.webkitAudioContext; if(!C) return;
       const ctx = this.ctx = new C();
       this.master = ctx.createGain(); this.master.gain.value = 0;
-      const comp = ctx.createDynamicsCompressor();
-      this.master.connect(comp); comp.connect(ctx.destination);
-      // shimmer delay
-      const d = ctx.createDelay(1.5); d.delayTime.value = .31;
-      const fb = ctx.createGain(); fb.gain.value = .38;
-      const lp = ctx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value = 3200;
+      const comp = ctx.createDynamicsCompressor(); this.master.connect(comp); comp.connect(ctx.destination);
+      const d = ctx.createDelay(1.5); d.delayTime.value = .33;
+      const fb = ctx.createGain(); fb.gain.value = .35;
+      const lp = ctx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value = 2600;
       d.connect(lp); lp.connect(fb); fb.connect(d); lp.connect(this.master);
       this.fx = d;
       if (ctx.state === "suspended") ctx.resume();
     }catch(e){ this.ctx = null; }
   },
   set(on){
-    this.on = on && !!this.ctx;
-    if(!this.ctx) return;
+    this.on = on && !!this.ctx; if(!this.ctx) return;
     if(this.ctx.state==="suspended") this.ctx.resume();
-    this.master.gain.setTargetAtTime(this.on ? .9 : 0, this.ctx.currentTime, .4);
-    $("#snd").textContent = this.on ? "🔊" : "🔈";
+    this.master.gain.setTargetAtTime(this.on ? .9 : 0, this.ctx.currentTime, .3);
+    $("#snd").textContent = "ovoz: " + (this.on ? "on" : "off");
   },
   tone(freq, dur, vol, type="sine", toFx=true, at=0){
     if(!this.on) return;
@@ -246,65 +257,61 @@ const Snd = {
     o.connect(g); g.connect(this.master); if(toFx) g.connect(this.fx);
     o.start(t); o.stop(t+dur+.05);
   },
-  key(){ // terminal klaviatura
+  key(v=.09){
     if(!this.on) return;
-    const c=this.ctx, t=c.currentTime, len=.03, buf=c.createBuffer(1, c.sampleRate*len, c.sampleRate), d=buf.getChannelData(0);
+    const c=this.ctx, t=c.currentTime, len=.028, buf=c.createBuffer(1, Math.floor(c.sampleRate*len), c.sampleRate), d=buf.getChannelData(0);
     for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,3);
     const s=c.createBufferSource(); s.buffer=buf;
-    const f=c.createBiquadFilter(); f.type="bandpass"; f.frequency.value=2200+Math.random()*1400; f.Q.value=1.2;
-    const g=c.createGain(); g.gain.value=.12;
+    const f=c.createBiquadFilter(); f.type="bandpass"; f.frequency.value=1800+Math.random()*1600; f.Q.value=1.1;
+    const g=c.createGain(); g.gain.value=v;
     s.connect(f); f.connect(g); g.connect(this.master); s.start(t);
   },
-  blip(){ // rasm yopishganda — pentatonik uchqun
+  blip(){
     if(!this.on) return;
-    const now=performance.now(); if(now-this.lastBlip<55) return; this.lastBlip=now;
-    const scale=[587.3,659.3,740,880,987.8,1174.7,1318.5,1480];
-    this.tone(scale[(Math.random()*scale.length)|0], .9, .035, "sine");
+    const now=performance.now(); if(now-this.lastBlip<60) return; this.lastBlip=now;
+    const sc=[587.3,659.3,740,880,987.8,1174.7,1318.5];
+    this.tone(sc[(Math.random()*sc.length)|0], .8, .028);
   },
-  bell(f=880, v=.12){ this.tone(f,3.2,v,"sine"); this.tone(f*2.005,2.2,v*.35,"sine"); this.tone(f*3.01,1.2,v*.12,"sine"); },
-  heart(){ this.tone(55,.35,.5,"sine",false); this.tone(52,.35,.38,"sine",false,.22); },
+  bell(f=880, v=.1){ this.tone(f,3,v); this.tone(f*2.005,2,v*.3); },
+  low(){ this.tone(73.4,2.5,.18,"sine",false); },
   startPad(){
     if(!this.ctx || this.padTimer) return;
-    const chords=[[146.83,220,277.18,369.99,440],[123.47,185,246.94,293.66,369.99],[98,146.83,196,246.94,293.66],[110,164.81,220,277.18,329.63]];
+    const chords=[[146.83,220,277.18,329.63],[123.47,185,246.94,293.66],[98,146.83,196,246.94],[110,164.81,220,277.18]];
     let i=0;
     const play=()=>{
       if(!this.on){ i++; return; }
-      const c=this.ctx, t=c.currentTime, dur=9.5;
-      const lp=c.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=1100; lp.connect(this.master); lp.connect(this.fx);
+      const c=this.ctx, t=c.currentTime, dur=10;
+      const lp=c.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=900; lp.connect(this.master); lp.connect(this.fx);
       chords[i%chords.length].forEach((f,k)=>{
-        [-4,4].forEach(det=>{
+        [-5,5].forEach(det=>{
           const o=c.createOscillator(), g=c.createGain();
           o.type=k===0?"sine":"triangle"; o.frequency.value=f; o.detune.value=det;
-          g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(k===0?.05:.018,t+2.6);
-          g.gain.setValueAtTime(k===0?.05:.018,t+dur-3); g.gain.linearRampToValueAtTime(0,t+dur);
+          const v = k===0 ? .045 : .014;
+          g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(v,t+3);
+          g.gain.setValueAtTime(v,t+dur-3.2); g.gain.linearRampToValueAtTime(0,t+dur);
           o.connect(g); g.connect(lp); o.start(t); o.stop(t+dur+.1);
         });
       });
-      // yumshoq qo‘ng‘iroq ohangi
-      const mel=[[587.3,659.3,740],[740,659.3,587.3],[493.9,587.3,659.3],[554.4,659.3,880]][i%4];
-      mel.forEach((f,k)=>this.tone(f,2.6,.03,"sine",true,1.2+k*1.9));
       i++;
     };
-    play(); this.padTimer=setInterval(play,8000);
+    play(); this.padTimer=setInterval(play,8500);
   }
 };
 $("#snd").addEventListener("pointerdown", e => { e.stopPropagation(); Snd.set(!Snd.on); if(Snd.on) Snd.startPad(); });
 
-/* =====================================================================
-   LAYOUT
-   ===================================================================== */
+/* ============ LAYOUT ============ */
 const DPR = Math.min(window.devicePixelRatio || 1, 2);
 const IMG_AR = 964/1280;
 let VW, VH, cell, rect, cols, rows, imgCol0, imgRow0, scrCols, scrRows;
 function layout(){
-  VW = window.innerWidth; VH = window.innerHeight;
+  VW = innerWidth; VH = innerHeight;
   let w = VW, h = w / IMG_AR;
   if (h > VH * 0.96) { h = VH * 0.96; w = h * IMG_AR; }
   cell = Math.max(5, Math.round(w / 74));
   cols = Math.floor(w / cell); rows = Math.floor(h / cell);
   w = cols * cell; h = rows * cell;
   imgCol0 = Math.round(((VW - w) / 2) / cell);
-  imgRow0 = Math.max(0, Math.round(((VH - h) / 2 - VH*0.02) / cell));
+  imgRow0 = Math.max(0, Math.round(((VH - h) / 2) / cell));
   rect = { x: imgCol0 * cell, y: imgRow0 * cell, w, h };
   scrCols = Math.ceil(VW / cell); scrRows = Math.ceil(VH / cell) + 1;
   for (const id of ["lockCv","colorCv","rainCv"]) {
@@ -312,65 +319,52 @@ function layout(){
     c.width = VW * DPR; c.height = VH * DPR; c.style.width = VW + "px"; c.style.height = VH + "px";
     c.getContext("2d").setTransform(DPR,0,0,DPR,0,0);
   }
-  const p = $("#photo");
-  Object.assign(p.style, { left: rect.x+"px", top: rect.y+"px", width: rect.w+"px", height: rect.h+"px" });
+  Object.assign($("#photo").style, { left: rect.x+"px", top: rect.y+"px", width: rect.w+"px", height: rect.h+"px" });
 }
 
-/* =====================================================================
-   RASMNI KATAKLARGA BO‘LISH
-   ===================================================================== */
+/* ============ RASM → KATAKLAR ============ */
 const RAMP = " .:-=+*o%#@";
-let cells; // {r,g,b,v,ch}
+const clamp255 = v => Math.max(0, Math.min(255, Math.round(v)));
+const greenOf = v => `rgb(${Math.round(20+60*v*v)},${Math.round(70+185*v)},${Math.round(40+75*v)})`;
+let cells;
 function analyse(img){
   const oc = document.createElement("canvas"); oc.width = cols; oc.height = rows;
   const x = oc.getContext("2d", { willReadFrequently:true });
   x.drawImage(img, 0, 0, cols, rows);
-  let data;
-  try { data = x.getImageData(0,0,cols,rows).data; }
-  catch(e){ data = null; }
-  const n = cols*rows, lum = new Float32Array(n);
-  cells = new Array(n);
+  let data = null; try { data = x.getImageData(0,0,cols,rows).data; } catch(e){}
+  const n = cols*rows, lum = new Float32Array(n); cells = new Array(n);
   for (let i=0;i<n;i++){
     const r = data? data[i*4] : 128, g = data? data[i*4+1] : 128, b = data? data[i*4+2] : 128;
-    lum[i] = (0.299*r + 0.587*g + 0.114*b)/255;
-    cells[i] = { r, g, b };
+    lum[i] = (0.299*r + 0.587*g + 0.114*b)/255; cells[i] = { r, g, b };
   }
-  // auto-levels (2% / 99.5%)
   const sorted = Array.from(lum).sort((a,b)=>a-b);
   const lo = sorted[Math.floor(n*0.02)], hi = sorted[Math.floor(n*0.995)];
+  const L = (xx,yy) => lum[Math.min(rows-1,Math.max(0,yy))*cols + Math.min(cols-1,Math.max(0,xx))];
   for (let yy=0; yy<rows; yy++) for (let xx=0; xx<cols; xx++){
     const i = yy*cols+xx;
-    const L = k => { const cx=Math.min(cols-1,Math.max(0,xx+k[0])), cy=Math.min(rows-1,Math.max(0,yy+k[1])); return lum[cy*cols+cx]; };
-    const gx = -L([-1,-1])-2*L([-1,0])-L([-1,1])+L([1,-1])+2*L([1,0])+L([1,1]);
-    const gy = -L([-1,-1])-2*L([0,-1])-L([1,-1])+L([-1,1])+2*L([0,1])+L([1,1]);
+    const gx = -L(xx-1,yy-1)-2*L(xx-1,yy)-L(xx-1,yy+1)+L(xx+1,yy-1)+2*L(xx+1,yy)+L(xx+1,yy+1);
+    const gy = -L(xx-1,yy-1)-2*L(xx,yy-1)-L(xx+1,yy-1)+L(xx-1,yy+1)+2*L(xx,yy+1)+L(xx+1,yy+1);
     const edge = Math.min(1, Math.hypot(gx,gy)*1.6);
     let v = Math.min(1, Math.max(0, (lum[i]-lo)/(hi-lo||1)));
-    v = Math.pow(v, 1.9);                     // oq fonni pasaytiramiz
-    v = Math.min(1, 0.10 + v*0.72 + edge*0.75);  // konturlarni yoritamiz
-    const c = cells[i];
-    c.v = v;
+    v = Math.min(1, 0.10 + Math.pow(v,1.9)*0.72 + edge*0.75);
+    const c = cells[i]; c.v = v;
     c.ch = RAMP[Math.min(RAMP.length-1, 1 + Math.floor(v*(RAMP.length-1)))];
-    // saturatsiyani biroz ko‘tarilgan rang
-    const avg = (c.r+c.g+c.b)/3, s = 1.25;
-    c.cr = clamp255(avg + (c.r-avg)*s); c.cg = clamp255(avg + (c.g-avg)*s); c.cb = clamp255(avg + (c.b-avg)*s);
+    const avg = (c.r+c.g+c.b)/3, s = 1.2;
+    c.cr = clamp255(avg+(c.r-avg)*s); c.cg = clamp255(avg+(c.g-avg)*s); c.cb = clamp255(avg+(c.b-avg)*s);
   }
 }
-const clamp255 = v => Math.max(0, Math.min(255, Math.round(v)));
-const greenOf = v => `rgb(${Math.round(25+70*v*v)},${Math.round(70+185*v)},${Math.round(40+80*v)})`;
 
-/* =====================================================================
-   1) START
-   ===================================================================== */
-async function startScreen(){
+/* ============ 1) START ============ */
+function startScreen(){
   const lines = [
-    "> yangi xabar: <b style='color:#d7ffe2'>Koreyadan</b>",
-    `> kimga: <b style='color:#d7ffe2'>${esc(AKA_NAME)} akam va ${esc(kelinHitob)}ga</b>`,
-    "> kimdan: <b style='color:#d7ffe2'>ukangdan</b>",
-    "> ichida: bitta sovg‘a <span style='color:#e8c46a'>♥</span>",
+    `<span class="muted">~/akamga $</span> ls`,
+    `rasm.jpg   akamga.txt   akamga`,
+    `<span class="muted">~/akamga $</span> cat README`,
+    `Kimga: ${esc(CONFIG.aka)} akamga.`,
+    `Kimdan: ukangdan.`,
   ];
   const box = $("#startLines");
-  lines.forEach((l,i)=>{ const d=document.createElement("div"); d.innerHTML=l; d.style.animationDelay=(0.3+i*0.55)+"s"; box.appendChild(d); });
-  const last = document.createElement("div"); last.className="cursor"; last.style.animationDelay="2.6s"; last.textContent=">"; box.appendChild(last);
+  lines.forEach((l,i)=>{ const d=document.createElement("div"); d.innerHTML=l; d.style.animationDelay=(0.15+i*0.28)+"s"; box.appendChild(d); });
   return new Promise(res=>{
     const go = withSound => e => {
       e.stopPropagation();
@@ -383,162 +377,111 @@ async function startScreen(){
   });
 }
 
-/* =====================================================================
-   2) TERMINAL
-   ===================================================================== */
-async function typeLine(container, html, speed=34){
-  const line = document.createElement("div"); container.appendChild(line);
-  line.classList.add("cursor");
-  const tmp = document.createElement("div"); tmp.innerHTML = html;
-  // teglar tartibi saqlanadi, matn harfma-harf
-  async function typeInto(src, dst){
-    for (const ch of Array.from(src.childNodes)){
-      if (ch.nodeType === 3){
-        const t = document.createTextNode(""); dst.appendChild(t);
-        for (const chr of ch.textContent){ t.textContent += chr; if (chr!==" ") Snd.key(); await sleep(speed + Math.random()*speed*0.6); }
-      } else { const cl = ch.cloneNode(false); dst.appendChild(cl); await typeInto(ch, cl); }
-    }
-  }
-  await typeInto(tmp, line);
-  line.classList.remove("cursor");
-  return line;
+/* ============ 2) TERMINAL ============ */
+function row(html, cls="row"){ const d=document.createElement("div"); d.className=cls; d.innerHTML=html; $("#termInner").appendChild(d); return d; }
+async function typeRow(prefixHtml, text, speed=45, cls="row"){
+  const d = row(prefixHtml, cls); const t = document.createElement("span"); d.appendChild(t); d.classList.add("cur");
+  for (const ch of text){ t.textContent += ch; if(ch!==" ") Snd.key(.07); await sleep(speed + Math.random()*speed*.7); }
+  d.classList.remove("cur"); return d;
 }
+const P = `<span class="p">ukang@seoul</span><span class="t">:</span><span class="h">~/akamga</span><span class="t">$</span> `;
 async function terminal(){
-  const term = $("#term"), inner = $("#termInner");
-  term.style.opacity = 1;
-  await sleep(500);
-  await typeLine(inner, "> salom, akajon. bu — <span class='w'>ukangdan</span>.");
-  await sleep(450);
-  await typeLine(inner, "> ulanish: Koreya → O‘zbekiston ...... <span class='w'>OK</span>", 26);
-  await sleep(300);
-  const dl = await typeLine(inner, "> oramizdagi masofa: ", 26);
-  const num = document.createElement("span"); num.className="w"; dl.appendChild(num);
-  // 4 886 km → 0
-  const t0 = performance.now(), D = 2600, KM = 4886;
-  await new Promise(r=>{ (function f(){ const p=Math.min(1,(performance.now()-t0)/D), e=1-Math.pow(1-p,3);
-      num.textContent = Math.round(KM*(1-e)).toLocaleString("ru-RU").replace(/,/g," ") + " km";
-      if(Math.random()<.5) Snd.key();
-      p<1 ? requestAnimationFrame(f) : r(); })(); });
-  Snd.bell(880,.09);
+  $("#term").style.opacity = 1;
   await sleep(400);
-  await typeLine(inner, "> <span class='g'>yurak uchun masofa: 0 km ♥</span>", 40);
+  await typeRow(P, "git log --reverse --format='%h  %ad  %s'", 32);
+  await sleep(350);
+  const log = [
+    ["a3f91c0","01:12","boshladim. akamga."],
+    ["5e7d2b4","02:47","matrix yomg'iri"],
+    ["c09e1a7","04:30","kod rasmga yopishadigan qildim"],
+    ["8b14f6e","05:55","fix: yuzlar chiqmayapti"],
+    ["d2a7730","07:20","fix: yuzlar yana"],
+    ["19c4e0b","09:03","oyat"],
+    ["7f0b9d2","11:41","xat, birinchi varianti"],
+    ["e6a3c51","13:26","xatni o'chirdim. qaytadan"],
+    ["b8d09f4","16:12","xat, yana qaytadan"],
+    ["40e7a1c","19:38","telefonda tekshirdim"],
+    ["f1c6e28","22:57","oxirgi tuzatishlar"],
+    ["0d9be33","00:31","tayyor"],
+  ];
+  for (const [h,t,s] of log){ row(`<span class="h">${h}</span>  <span class="t">${t}</span>  ${esc(s)}`); Snd.key(.04); await sleep(110); }
+  await sleep(900);
+  row(`<span class="t">12 commit · 24 soat · 0 soat uyqu</span>`);
+  await sleep(1500);
+  await typeRow(P, "./akamga", 70);
   await sleep(700);
-  await typeLine(inner, `> bugun: ${CONFIG.sana} — <span class='w'>akamning to‘yi</span>`, 30);
-  await sleep(500);
-  await typeLine(inner, "> ukang to‘yga yetib borolmadi...", 46);
-  await sleep(900);
-  await typeLine(inner, "> shuning uchun to‘yga <span class='g'>kod bo‘lib</span> keldi.", 46);
-  await sleep(1100);
-  await typeLine(inner, "> sovg‘a ochilmoqda", 60);
-  await sleep(900);
-  term.style.opacity = 0;
+  row(`<span class="t">[ulanish]</span> Koreya → O'zbekiston`); Snd.key(.05);
+  await sleep(700);
+  row(`<span class="t">[masofa]</span>  <span class="w">4 800 km</span>`); Snd.low();
+  await sleep(2000);
+  await typeRow("", "To'yingga borolmadim, aka.", 70, "row big");
+  await sleep(1300);
+  await typeRow("", "Shuning uchun kod bo'lib keldim.", 70, "row big");
+  await sleep(2000);
+  $("#term").style.opacity = 0;
+  await sleep(600);
 }
 
-/* =====================================================================
-   3) KOD YOMG‘IRI → RASM
-   ===================================================================== */
-const RAIN_CHARS = "01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ<>{}[]=+*#$%&";
-const WORDS = ["AKA","AKAJON","BAXT","SEVGI","TO‘Y","DUO","OILA","QO‘SHA QARINGLAR","UKANG","MUBORAK"];
+/* ============ 3) YOMG'IR → RASM ============ */
+const RAIN_CHARS = "01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワン0123456789ABCDEFZ<>{}=+*#$%";
 const rc = () => RAIN_CHARS[(Math.random()*RAIN_CHARS.length)|0];
-
-async function rainToImage(){
+function rainToImage(){
   const lockX = $("#lockCv").getContext("2d"), rainX = $("#rainCv").getContext("2d");
   const font = `700 ${Math.round(cell*1.18)}px "JetBrains Mono", ui-monospace, monospace`;
   lockX.font = rainX.font = font; lockX.textAlign = rainX.textAlign = "center"; lockX.textBaseline = rainX.textBaseline = "middle";
   const n = cols*rows, locked = new Uint8Array(n);
   let lockedCount = 0;
-  // yuzlar oxirida ochilsin (taxminiy joylari)
   const faces = [[0.368,0.405],[0.586,0.362]];
   const weight = new Float32Array(n);
   for (let r=0;r<rows;r++) for (let c=0;c<cols;c++){
-    const fx = c/cols, fy = r/rows; let w = 1;
-    for (const [ax,ay] of faces){ const d = Math.hypot((fx-ax), (fy-ay)*IMG_AR); if (d<0.075) w = Math.min(w, 0.12 + d*4); }
+    let w = 1; for (const [ax,ay] of faces){ const d = Math.hypot(c/cols-ax, (r/rows-ay)*IMG_AR); if (d<0.075) w = Math.min(w, 0.15 + d*4); }
     weight[r*cols+c] = w;
   }
   const settling = [];
-  const lockCell = (i, t) => {
-    locked[i] = 1; lockedCount++;
-    settling.push({ i, until: t + 260 + Math.random()*260 });
-    Snd.blip();
-  };
+  const lockCell = (i, t) => { locked[i]=1; lockedCount++; settling.push({ i, until: t + 220 + Math.random()*260 }); Snd.blip(); };
   const drawCell = (i, ch, color) => {
-    const cx = i % cols, cy = (i/cols)|0, x = rect.x + cx*cell, y = rect.y + cy*cell;
-    lockX.clearRect(x-0.5, y-0.5, cell+1, cell+1);
-    lockX.fillStyle = color; lockX.fillText(ch, x + cell/2, y + cell/2 + 0.5);
+    const x = rect.x + (i%cols)*cell, y = rect.y + ((i/cols)|0)*cell;
+    lockX.clearRect(x-0.5, y-0.5, cell+1, cell+1); lockX.fillStyle = color; lockX.fillText(ch, x+cell/2, y+cell/2+0.5);
   };
-
-  // tomchilar
   const drops = [];
-  const spawn = (col, initial) => {
-    const word = Math.random() < 0.16 ? WORDS[(Math.random()*WORDS.length)|0] : null;
-    drops.push({ col, y: initial ? -Math.random()*scrRows : -Math.random()*12, sp: (0.28 + Math.random()*0.55), last: -999, word, wi:0 });
-  };
+  const spawn = (col, init) => drops.push({ col, y: init ? -Math.random()*scrRows : -Math.random()*12, sp: .28 + Math.random()*.55 });
   for (let c=0;c<scrCols;c++){ spawn(c,true); spawn(c,true); if (Math.random()<.6) spawn(c,true); }
-
-  const T0 = performance.now();
-  const RAMP_START = 2600, RAMP_END = 10500, FORCE = 11200, STOP_SPAWN = 12600;
-  let spawning = true, prev = T0, forcedAll = false;
+  const T0 = performance.now(), RAMP_START = 2600, RAMP_END = 10500, FORCE = 11200, STOP_SPAWN = 12600;
+  let spawning = true, prev = T0, done = false;
   return new Promise(resolve => {
     function frame(now){
       const dt = Math.min(50, now - prev) / 16.67; prev = now;
       const t = now - T0;
-      // quyruqlarni so‘ndirish (shaffof)
-      rainX.globalCompositeOperation = "destination-out";
-      rainX.fillStyle = "rgba(0,0,0,0.13)"; rainX.fillRect(0,0,VW,VH);
+      rainX.globalCompositeOperation = "destination-out"; rainX.fillStyle = "rgba(0,0,0,0.13)"; rainX.fillRect(0,0,VW,VH);
       rainX.globalCompositeOperation = "source-over";
-
       let p = 0;
-      if (t > RAMP_START){ const k = Math.min(1,(t-RAMP_START)/(RAMP_END-RAMP_START)); p = 0.015 + 0.55 * k*k*(3-2*k); }
-
+      if (t > RAMP_START){ const k = Math.min(1,(t-RAMP_START)/(RAMP_END-RAMP_START)); p = 0.015 + 0.55*k*k*(3-2*k); }
       for (let d = drops.length-1; d >= 0; d--){
-        const dr = drops[d];
-        const oldRow = Math.floor(dr.y);
-        dr.y += dr.sp * dt;
-        const newRow = Math.floor(dr.y);
-        for (let row = oldRow+1; row <= newRow; row++){
-          if (row < 0) continue;
-          let ch;
-          if (dr.word){ ch = dr.word[dr.wi % dr.word.length]; dr.wi++; } else ch = rc();
-          const x = dr.col*cell + cell/2, y = row*cell + cell/2;
-          // oldingi bosh -> yashil
-          rainX.fillStyle = dr.word ? "#e8c46a" : "#2cff6e";
-          if (row-1 >= 0) rainX.fillText(dr.lastCh || ch, x, y - cell);
-          rainX.fillStyle = "#e6ffee"; rainX.fillText(ch, x, y);
-          dr.lastCh = ch;
-          // yopishish
-          const ic = dr.col - imgCol0, ir = row - imgRow0;
-          if (ic>=0 && ic<cols && ir>=0 && ir<rows){
-            const i = ir*cols+ic;
-            if (!locked[i] && Math.random() < p * weight[i]) lockCell(i, now);
-          }
+        const dr = drops[d], oldRow = Math.floor(dr.y); dr.y += dr.sp*dt; const newRow = Math.floor(dr.y);
+        for (let rr = oldRow+1; rr <= newRow; rr++){
+          if (rr < 0) continue;
+          const ch = rc(), x = dr.col*cell + cell/2, y = rr*cell + cell/2;
+          rainX.fillStyle = "#2cff6e"; if (rr-1 >= 0) rainX.fillText(dr.lastCh || ch, x, y - cell);
+          rainX.fillStyle = "#e6ffee"; rainX.fillText(ch, x, y); dr.lastCh = ch;
+          const ic = dr.col - imgCol0, ir = rr - imgRow0;
+          if (ic>=0 && ic<cols && ir>=0 && ir<rows){ const i = ir*cols+ic; if (!locked[i] && Math.random() < p*weight[i]) lockCell(i, now); }
         }
         if (dr.y > scrRows + 2){ drops.splice(d,1); if (spawning) spawn(dr.col,false); }
       }
-      // majburiy to‘ldirish — oxirgi qism (yuzlar eng oxirida)
       if (t > FORCE && lockedCount < n){
-        const quota = Math.ceil(n*0.012*dt);
-        let made = 0;
-        for (let tries=0; tries<quota*6 && made<quota; tries++){
-          const i = (Math.random()*n)|0;
-          if (!locked[i] && (weight[i] > 0.5 || t > FORCE+1300)){ lockCell(i, now); made++; }
-        }
-        if (t > FORCE + 2600){ for (let i=0;i<n;i++) if(!locked[i]) { locked[i]=1; lockedCount++; settling.push({i, until: now+200}); } }
+        const quota = Math.ceil(n*0.012*dt); let made = 0;
+        for (let tries=0; tries<quota*6 && made<quota; tries++){ const i = (Math.random()*n)|0; if (!locked[i] && (weight[i] > .5 || t > FORCE+1300)){ lockCell(i, now); made++; } }
+        if (t > FORCE + 2600) for (let i=0;i<n;i++) if(!locked[i]){ locked[i]=1; lockedCount++; settling.push({i, until: now+200}); }
       }
-      // titrab o‘rnashish
       for (let s = settling.length-1; s>=0; s--){
         const st = settling[s], c = cells[st.i];
-        if (now >= st.until){ drawCell(st.i, c.ch, greenOf(c.v)); settling.splice(s,1); }
-        else drawCell(st.i, rc(), "#d8ffe4");
+        if (now >= st.until){ drawCell(st.i, c.ch, greenOf(c.v)); settling.splice(s,1); } else drawCell(st.i, rc(), "#d8ffe4");
       }
       if (t > STOP_SPAWN) spawning = false;
-      if (lockedCount >= n && settling.length === 0 && !forcedAll){
-        forcedAll = true; spawning = false; resolve();   // rasm tayyor — keyingi sahna boshlanadi
-      }
-      // qolgan tomchilar tushib bo‘lgach yomg‘ir to‘xtaydi
-      if (forcedAll && (drops.length === 0 || t > STOP_SPAWN + 6000)){
+      if (!done && lockedCount >= n && settling.length === 0){ done = true; spawning = false; resolve(); }
+      if (done && (drops.length === 0 || t > STOP_SPAWN + 6000)){
         const rv = $("#rainCv"); rv.style.transition = "opacity 1.2s"; rv.style.opacity = 0;
-        setTimeout(()=> rainX.clearRect(0,0,VW,VH), 1300);
-        return;
+        setTimeout(()=> rainX.clearRect(0,0,VW,VH), 1300); return;
       }
       requestAnimationFrame(frame);
     }
@@ -546,174 +489,161 @@ async function rainToImage(){
   });
 }
 
-/* rangli mozaika + skaner chizig‘i + haqiqiy rasm */
 async function colorize(){
   const cx = $("#colorCv").getContext("2d");
-  cx.font = `700 ${Math.round(cell*1.18)}px "JetBrains Mono", ui-monospace, monospace`;
-  cx.textAlign = "center"; cx.textBaseline = "middle";
+  cx.font = `700 ${Math.round(cell*1.18)}px "JetBrains Mono", ui-monospace, monospace`; cx.textAlign = "center"; cx.textBaseline = "middle";
   for (let i=0;i<cells.length;i++){
     const c = cells[i], x = rect.x + (i%cols)*cell, y = rect.y + ((i/cols)|0)*cell;
-    // rangli fon (yorug‘lik) + rangli belgi
     cx.fillStyle = `rgba(${c.cr},${c.cg},${c.cb},0.42)`; cx.fillRect(x, y, cell, cell);
-    cx.fillStyle = `rgb(${clamp255(c.cr*1.12)},${clamp255(c.cg*1.12)},${clamp255(c.cb*1.12)})`;
+    cx.fillStyle = `rgb(${clamp255(c.cr*1.1)},${clamp255(c.cg*1.1)},${clamp255(c.cb*1.1)})`;
     cx.fillText(c.ch === " " ? "." : c.ch, x+cell/2, y+cell/2+0.5);
   }
   const cv = $("#colorCv"), scan = $("#scan");
   cv.style.transition = "none"; cv.style.opacity = 1;
   Object.assign(scan.style, { left: rect.x+"px", width: rect.w+"px", opacity: 1 });
-  Snd.bell(587.3,.08); Snd.bell(880,.05);
+  cv.style.webkitMaskSize = cv.style.maskSize = `${rect.w}px ${rect.h}px`;
+  cv.style.webkitMaskPosition = cv.style.maskPosition = `${rect.x}px ${rect.y}px`;
+  cv.style.webkitMaskRepeat = cv.style.maskRepeat = "no-repeat";
+  Snd.bell(587.3,.07);
   const D = 2600, t0 = performance.now();
   await new Promise(r => (function f(){
-    const p = Math.min(1,(performance.now()-t0)/D), e = p<.5 ? 2*p*p : 1-Math.pow(-2*p+2,2)/2;
-    const pos = e*112 - 6;
+    const p = Math.min(1,(performance.now()-t0)/D), e = p<.5 ? 2*p*p : 1-Math.pow(-2*p+2,2)/2, pos = e*112 - 6;
     const m = `linear-gradient(to bottom, #000 0%, #000 ${pos}%, transparent ${pos+6}%)`;
     cv.style.webkitMaskImage = m; cv.style.maskImage = m;
-    cv.style.webkitMaskSize = cv.style.maskSize = `${rect.w}px ${rect.h}px`;
-    cv.style.webkitMaskPosition = cv.style.maskPosition = `${rect.x}px ${rect.y}px`;
-    cv.style.webkitMaskRepeat = cv.style.maskRepeat = "no-repeat";
     scan.style.top = (rect.y + rect.h*Math.min(1,Math.max(0,pos/100))) + "px";
     p<1 ? requestAnimationFrame(f) : r();
   })());
   scan.style.transition = "opacity .8s"; scan.style.opacity = 0;
   cv.style.webkitMaskImage = cv.style.maskImage = "none";
   $("#lockCv").style.transition = "opacity 1.2s"; $("#lockCv").style.opacity = 0;
-  await sleep(700);
-  // haqiqiy rasm
-  const ph = $("#photo"); ph.classList.add("show");
-  Snd.bell(1174.7,.07);
+  await sleep(600);
+  $("#photo").classList.add("show"); Snd.bell(880,.06);
   await sleep(1400);
   cv.style.transition = "opacity 2s"; cv.style.opacity = 0;
-  ph.classList.add("breathe");
-  await sleep(2600);
+  await sleep(3800);
 }
 
-/* =====================================================================
-   4) OYAT
-   ===================================================================== */
+/* ============ 4) OYAT ============ */
 async function verse(){
-  const v = $("#verse");
-  v.style.opacity = 1; Snd.bell(659.3,.08);
-  await waitTap(6500);
-  v.style.opacity = 0;
-  await sleep(1400);
+  const v = $("#verse"); v.style.opacity = 1; Snd.bell(659.3,.07);
+  await sleep(1200); await waitTap(6500);
+  v.style.opacity = 0; await sleep(1200);
 }
 
-/* =====================================================================
-   5) XAT
-   ===================================================================== */
-const SCREENS = [
-  { t: "Assalomu alaykum, akajon." },
-  { t: "Bugun — umringning eng uzoq kutilgan kuni.\nTo‘ying muborak bo‘lsin!" },
-  { t: "Seni chin qalbimdan tabriklayman.\nChin yuragimdan baxt tilayman." },
-  { t: "Bugun seni kuyov libosida ko‘rdim…\nSenga shunchalik yarashibdiki, akam.\nKo‘zimni uzolmadim." },
-  { t: "Men esa bu yoqda, Koreyada —\ntelefon ekraniga tikilib,\nhar bir lahzani yuragimga yozib o‘tirdim.", cls:"soft" },
-  { t: "To‘yingda ukang bo‘lib eng oldingda turishni,\nhammasini o‘z ko‘zim bilan ko‘rishni\nshunchalik xohlagandim…" },
-  { t: "Afsus, bu safar yoningda bo‘lolmadim.", cls:"soft", hold: 1500 },
-  { t: "Lekin bil:\nbugun yuragim o‘sha yerda edi.\nSening yoningda. Eng oldinda." },
-  { t: "Telefonda bo‘lsa ham ko‘rdim —\nto‘ying men kutganimdan ham zo‘r o‘tyapti.\nShukr." },
-  { t: "Akam…\nShu kungacha eng og‘ir sinovlarni\nsen ko‘tarding.", hold: 1200 },
-  { t: "Charchasang ham — sezdirmading.\nQiyin bo‘lsa ham — taslim bo‘lmading." },
-  { t: "Biz uchun qo‘lingdan kelgan hamma narsani qilding.\nMeni doim, har tomonlama qo‘llab-quvvatlading.\nHozirgacha." },
-  { t: "Ko‘p narsani men kitobdan emas —\nsendan o‘rgandim.\nSen menga o‘rnak bo‘lding." },
-  { t: "Sendek akam borligidan faxrlanaman.\nSen men uchun dunyodagi eng zo‘r akasan." },
-  { t: "Seni yaxshi ko‘raman, akam.", cls:"climax", hold: 4200, heart:true },
-  { t: "Hammasi uchun rahmat." , hold: 800 },
-  { t: "Va’da beraman:\ninshaalloh, qilgan barcha yaxshiliklaringning\nrohatini hali ko‘rasizlar." },
-  { t: `${AKA_NAME}, ${kelinHitob} —\nikkovingizni ham chin qalbimdan\ntabriklayman! 🤍`, hold: 600 },
-  { t: "Bir-biringizga shunchalik yarashibsizlarki…\nRasmingizga qayta-qayta qaradim." },
-  { t: "Bugundan boshlab yo‘lingiz bitta,\nuyingiz bitta, baxtingiz bitta bo‘lsin." },
-  { t: "Bir-biringizning qadringizga yeting,\nbir-biringizga suyanch bo‘linglar —\nhar doim, har qanday kunda." },
-  { t: "Alloh sizlarni bir-biringizga\njuft qilib yaratgan ekan —\numrbod baxtli bo‘linglar.", cls:"dua" },
-  { t: "Qo‘sha qaringlar.\nUzoq umr ko‘ringlar,\ndoim sog‘-salomat bo‘linglar.", cls:"dua" },
-  { t: "Uyingizdan kulgi, mehr va baraka\nhech qachon arimasin.", cls:"dua" },
-  { t: "Shu kundan keyingi hayotingiz\nfaqat yaxshi kunlar, quvonch va baxtga\nto‘la bo‘lsin.\n\nOmin.", cls:"dua", hold: 1200 },
-];
-async function messages(){
-  $("#photo").classList.add("dim");
-  await sleep(1200);
-  const msg = $("#msg"), box = $("#msgBox"), prog = $("#prog"), hint = $("#hint");
-  msg.style.opacity = 1;
-  for (let k=0; k<SCREENS.length; k++){
-    const s = SCREENS[k];
-    box.className = "box" + (s.cls ? " " + s.cls : "");
-    box.innerHTML = "";
-    let wi = 0;
-    s.t.split("\n").forEach((ln, li, arr) => {
-      ln.split(" ").forEach((w, j, a) => {
-        if (!w) return;
-        const sp = document.createElement("span"); sp.className = "w";
-        sp.textContent = w + (j < a.length-1 ? " " : "");
-        sp.style.animationDelay = (wi * (s.cls==="climax" ? 0.42 : 0.11)) + "s"; wi++;
-        box.appendChild(sp);
-      });
-      if (li < arr.length-1) box.appendChild(document.createElement("br"));
-    });
-    if (s.heart){ const h = document.createElement("span"); h.className="heart"; h.textContent="♥"; h.style.color="#ff6b8a"; box.appendChild(h); }
-    box.style.opacity = 1; box.style.transition = "none";
-    prog.style.width = ((k+1)/SCREENS.length*100) + "%";
-    if (s.cls === "climax"){ Snd.heart(); setTimeout(()=>Snd.heart(), 1400); setTimeout(()=>Snd.bell(587.3,.1), 2400); }
-    else Snd.tone(1174.7, 1.6, .025);
-    if (k === 0) setTimeout(()=> hint.style.opacity = 1, 2500);
-    if (k === 3) hint.style.opacity = 0;
-    const read = Math.max(3200, s.t.length * 62) + (s.hold || 0) + wi*110;
-    await sleep(700);           // tasodifiy bosib yubormaslik uchun
-    await waitTap(read);
-    box.style.transition = "opacity .7s"; box.style.opacity = 0;
-    await sleep(750);
-  }
-  msg.style.opacity = 0; prog.style.opacity = 0;
-}
-
-/* =====================================================================
-   6) YAKUN
-   ===================================================================== */
-async function finale(){
-  $("#fDate").textContent = CONFIG.sana;
-  $("#fNames").innerHTML = `${esc(AKA_NAME)}<span class="amp">♥</span>${esc(KELIN_NAME)}`;
-  $("#fSign").innerHTML = `Uzoqdan, lekin hammadan yaqin —<br><b>ukang${CONFIG.uka ? ", " + esc(CONFIG.uka) : ""}</b>`;
-  $("#fLog").innerHTML = [
-    `<div class="h">$ cat sovg‘a.log</div>`,
-    `<span class="k">muallif ........</span> ukang`,
-    `<span class="k">manzil .........</span> Koreya → O‘zbekiston`,
-    `<span class="k">qurilish vaqti .</span> 24 soat, uyqusiz`,
-    `<span class="k">har bir satri ..</span> bitta duo`,
-    `<span class="k">sabab ..........</span> dunyodagi eng zo‘r aka`,
-    `<span class="k">status .........</span> <span class="ok">yetkazildi ✓</span>`,
-  ].join("<br>");
-  $("#final").classList.add("show");
-  Snd.bell(587.3,.1); setTimeout(()=>Snd.bell(880,.08),900); setTimeout(()=>Snd.bell(1174.7,.06),1800);
-  particles();
-}
-const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
-function particles(){
-  const cv = $("#particles"), x = cv.getContext("2d");
-  const fit = () => { cv.width = innerWidth*DPR; cv.height = innerHeight*DPR; x.setTransform(DPR,0,0,DPR,0,0); };
-  fit(); addEventListener("resize", fit);
-  const P = Array.from({length: 46}, () => mk(true));
-  function mk(init){ return { x: Math.random()*innerWidth, y: init ? Math.random()*innerHeight : innerHeight+20,
-      v: .25+Math.random()*.6, s: 10+Math.random()*12, a: .15+Math.random()*.45, ch: "♥01♥10♥"[(Math.random()*7)|0], gold: Math.random()<.55, ph: Math.random()*6 }; }
-  (function f(t){
-    x.clearRect(0,0,innerWidth,innerHeight);
-    for (const p of P){
-      p.y -= p.v; p.x += Math.sin(t/1600 + p.ph)*.25;
-      if (p.y < -20) Object.assign(p, mk(false));
-      x.globalAlpha = p.a; x.fillStyle = p.gold ? "#e8c46a" : "#3dff7a";
-      x.font = `${p.s}px "JetBrains Mono", monospace`; x.fillText(p.ch, p.x, p.y);
+/* ============ 5) XAT — MUHARRIRDA JONLI YOZILADI ============ */
+async function letter(){
+  $("#photo").classList.add("out");
+  await sleep(800);
+  const ed = $("#editor"), code = $("#code"), tab = $("#tab"), stR = $("#stR");
+  code.innerHTML = ""; tab.classList.remove("saved");
+  ed.classList.add("show");
+  await sleep(1300);
+  $("#tapHint").style.opacity = 1; setTimeout(()=> $("#tapHint").style.opacity = 0, 6000);
+  const caret = document.createElement("span"); caret.className = "caret";
+  let lnNo = 0, active = null;
+  const newLine = () => {
+    lnNo++; if (active) active.classList.remove("active");
+    const l = document.createElement("div"); l.className = "ln active";
+    l.innerHTML = `<div class="n">${lnNo}</div><div class="c"></div>`;
+    code.appendChild(l); active = l;
+    const c = l.querySelector(".c"); c.appendChild(caret);
+    return c;
+  };
+  const scroll = () => { code.scrollTop = code.scrollHeight; };
+  const fast = () => holding;
+  for (const para of LETTER){
+    const c = newLine(); scroll();
+    const txt = document.createTextNode(""); c.insertBefore(txt, caret);
+    if (para === "— ukang") c.classList.add("sign");
+    let slow = false;
+    const parts = para.split(/(\[\[[a-z]+(?::\d+)?\]\])/);
+    for (const part of parts){
+      const m = part.match(/^\[\[([a-z]+)(?::(\d+))?\]\]$/);
+      if (m){
+        if (m[1] === "p"){ caret.classList.remove("typing"); await sleep(fast() ? 80 : +m[2]); }
+        else if (m[1] === "slow") slow = true;
+        else if (m[1] === "d"){
+          caret.classList.add("typing");
+          for (let k=0;k<+m[2];k++){ txt.textContent = txt.textContent.slice(0,-1); Snd.key(.06); await sleep(fast()? 10 : 70); }
+        }
+        continue;
+      }
+      caret.classList.add("typing");
+      for (const ch of part){
+        txt.textContent += ch;
+        if (ch !== " ") Snd.key(.075);
+        stR.textContent = `Ln ${lnNo}, Col ${txt.textContent.length+1} · UTF-8`;
+        let d = slow ? 150 + Math.random()*90 : 34 + Math.random()*46;
+        if (".!?".includes(ch)) d += slow ? 300 : 260 + Math.random()*200;
+        else if (",—".includes(ch)) d += 140;
+        if (fast()) d = 6;
+        if (txt.textContent.length % 18 === 0) scroll();
+        await sleep(d);
+      }
     }
-    x.globalAlpha = 1;
+    caret.classList.remove("typing");
+    scroll();
+    await sleep(fast() ? 60 : (para === "" ? 250 : 650));
+  }
+  await sleep(1500);
+  // saqlash va yuborish
+  tab.classList.add("saved"); $("#stL").textContent = "ukang@seoul · main · saqlandi";
+  await sleep(1100);
+  const panel = $("#panel"), pb = $("#panelBody"); pb.innerHTML = ""; panel.classList.add("open");
+  await sleep(700); scroll();
+  const prow = h => { const d = document.createElement("div"); d.innerHTML = h; pb.appendChild(d); return d; };
+  const ptype = async (cmd) => { const d = prow(`<span class="p">$</span> `); const s = document.createElement("span"); d.appendChild(s);
+    for (const ch of cmd){ s.textContent += ch; Snd.key(.06); await sleep(38 + Math.random()*30); } };
+  await ptype(`git commit -am "To'ying muborak, aka"`); await sleep(400);
+  prow(`<span class="t">[main 7a1c3e9] To'ying muborak, aka · 1 file changed</span>`); await sleep(900);
+  await ptype(`git push uzbekistan main`); await sleep(500);
+  prow(`<span class="t">Koreya → O'zbekiston · 4 800 km</span>`); await sleep(1300);
+  prow(`<span class="ok">yetkazildi.</span>`); Snd.bell(587.3,.08);
+  await sleep(2600);
+  ed.classList.remove("show");
+  await sleep(1300);
+}
+
+/* ============ 6) YAKUN ============ */
+let bgRainStarted = false;
+function bgRain(){
+  if (bgRainStarted) return; bgRainStarted = true;
+  const cv = $("#bgRain"), x = cv.getContext("2d"), cs = 14;
+  let W, H, colsN, ys;
+  const fit = () => { W = innerWidth; H = innerHeight; cv.width = W*DPR; cv.height = H*DPR; x.setTransform(DPR,0,0,DPR,0,0);
+    colsN = Math.ceil(W/cs); ys = Array.from({length: colsN}, () => Math.random()*-H/cs); x.font = `${cs}px "JetBrains Mono", monospace`; };
+  fit(); addEventListener("resize", fit);
+  let last = 0;
+  (function f(t){
+    if (t - last > 55){
+      last = t;
+      x.fillStyle = "rgba(0,0,0,.12)"; x.fillRect(0,0,W,H);
+      x.fillStyle = "#3dff7a";
+      for (let i=0;i<colsN;i++){ x.fillText(rc(), i*cs, ys[i]*cs); ys[i] += 1; if (ys[i]*cs > H && Math.random() > .975) ys[i] = 0; }
+    }
     requestAnimationFrame(f);
   })(0);
 }
+function finale(){
+  $("#fMeta").textContent = `${CONFIG.sana} · Koreya → O'zbekiston`;
+  $("#fNames").innerHTML = `${esc(CONFIG.aka)}<span class="amp">&amp;</span>${esc(CONFIG.kelin)}`;
+  $("#fSign").innerHTML = `<span class="t">// </span>ukang. Koreyadan.`;
+  $("#final").classList.add("show"); $("#final").scrollTop = 0;
+  bgRain();
+  Snd.bell(587.3,.08); setTimeout(()=>Snd.bell(880,.06),900);
+}
 $("#replay").addEventListener("click", () => location.reload());
+$("#reread").addEventListener("click", async e => {
+  e.stopPropagation(); $("#final").classList.remove("show"); await sleep(1200);
+  await letter(); finale();
+});
 
-/* =====================================================================
-   ASOSIY OQIM
-   ===================================================================== */
+/* ============ ASOSIY OQIM ============ */
 (async function main(){
   const img = $("#photo");
   const loaded = img.complete && img.naturalWidth ? Promise.resolve() : new Promise(r => { img.onload = r; img.onerror = r; });
   await startScreen();
-  $("#start").style.opacity = 0; setTimeout(()=>$("#start").remove(), 900);
+  $("#start").style.opacity = 0; setTimeout(()=>$("#start").remove(), 700);
   try { await document.fonts.ready; } catch(e){}
   await loaded;
   layout(); analyse(img);
@@ -721,8 +651,8 @@ $("#replay").addEventListener("click", () => location.reload());
   await rainToImage();
   await colorize();
   await verse();
-  await messages();
-  await finale();
+  await letter();
+  finale();
 })();
 </script>
 </body>
