@@ -188,6 +188,17 @@ const Snd = {
   init(){
     try{
       try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch(e){}   // iPhone jim rejimda ham chalinsin
+      // Telegram ichidagi iPhone brauzeri uchun: jim <audio> aylanib turadi — iOS ovozni "media" deb biladi,
+      // shunda yon tomondagi jim rejim tugmasi yoqiq bo'lsa ham WebAudio eshitiladi
+      try {
+        const sr = 8000, n = sr, b = new ArrayBuffer(44 + n*2), v = new DataView(b);
+        const w = (o, s) => { for (let i=0;i<s.length;i++) v.setUint8(o+i, s.charCodeAt(i)); };
+        w(0,"RIFF"); v.setUint32(4,36+n*2,true); w(8,"WAVEfmt "); v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true);
+        v.setUint32(24,sr,true); v.setUint32(28,sr*2,true); v.setUint16(32,2,true); v.setUint16(34,16,true); w(36,"data"); v.setUint32(40,n*2,true);
+        const a = this.unlock = new Audio(URL.createObjectURL(new Blob([b], { type:"audio/wav" })));
+        a.loop = true; a.setAttribute("playsinline",""); a.setAttribute("webkit-playsinline","");
+        const p = a.play(); if (p && p.catch) p.catch(()=>{});
+      } catch(e){}
       const C = window.AudioContext || window.webkitAudioContext; if(!C) return;
       const ctx = this.ctx = new C();
       this.master = ctx.createGain(); this.master.gain.value = 0;
@@ -201,7 +212,10 @@ const Snd = {
       const len = Math.floor(ctx.sampleRate*.026); this.noise = ctx.createBuffer(1, len, ctx.sampleRate);
       const nd = this.noise.getChannelData(0); for(let i=0;i<len;i++) nd[i]=(Math.random()*2-1)*Math.pow(1-i/len,3);
       if (ctx.state !== "running") ctx.resume();
-      const wake = () => { if (this.ctx && this.ctx.state !== "running") this.ctx.resume(); };
+      const wake = () => {
+        if (this.ctx && this.ctx.state !== "running") this.ctx.resume();
+        if (this.unlock && this.unlock.paused){ const p = this.unlock.play(); if (p && p.catch) p.catch(()=>{}); }
+      };
       document.addEventListener("visibilitychange", () => { if (!document.hidden) wake(); });
       document.addEventListener("pointerdown", wake);
     }catch(e){ this.ctx = null; }
