@@ -215,7 +215,12 @@ const Snd = {
       const C = window.AudioContext || window.webkitAudioContext; if(!C) return;
       const ctx = this.ctx = new C();
       this.master = ctx.createGain(); this.master.gain.value = 0;
-      const comp = ctx.createDynamicsCompressor(); this.master.connect(comp); comp.connect(ctx.destination);
+      // xavfsiz chiqish: juda past chastotalar kesiladi (kichik karnay "bijirlamasin"), yumshoq limiter, umumiy balandlik pasaytirilgan
+      const hp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 70; hp.Q.value = .7;
+      const comp = this.comp = ctx.createDynamicsCompressor();
+      comp.threshold.value = -14; comp.knee.value = 10; comp.ratio.value = 4; comp.attack.value = .005; comp.release.value = .3;
+      const out = this.out = ctx.createGain(); out.gain.value = .9;
+      this.master.connect(hp); hp.connect(comp); comp.connect(out); out.connect(ctx.destination);
       const d = ctx.createDelay(1.5); d.delayTime.value = .33;
       const fb = ctx.createGain(); fb.gain.value = .33;
       const lp = ctx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value = 2400;
@@ -258,13 +263,13 @@ const Snd = {
       const len = Math.floor(c.sampleRate*3.2), ir = c.createBuffer(2, len, c.sampleRate);
       for (let ch=0; ch<2; ch++){ const d = ir.getChannelData(ch); for (let i=0;i<len;i++) d[i] = (Math.random()*2-1)*Math.pow(1-i/len, 2.6); }
       this.hall = c.createConvolver(); this.hall.buffer = ir;
-      const hg = c.createGain(); hg.gain.value = .55; this.hall.connect(hg); hg.connect(this.master);
+      const hg = c.createGain(); hg.gain.value = .35; this.hall.connect(hg); hg.connect(this.master);
     }
     const bus = c.createGain(); bus.gain.value = 0;
     bus.connect(this.master);
-    const wet = c.createGain(); wet.gain.value = .6; bus.connect(wet); wet.connect(this.hall);
+    const wet = c.createGain(); wet.gain.value = .4; bus.connect(wet); wet.connect(this.hall);
     const t0 = c.currentTime + .3;
-    bus.gain.setValueAtTime(0, t0); bus.gain.linearRampToValueAtTime(.9, t0 + 3);
+    bus.gain.setValueAtTime(0, t0); bus.gain.linearRampToValueAtTime(.75, t0 + 3);
     // [bass, akkord (torlilar), pianino arpedjio, melodiya [[beat, nota, uzunlik]]]  — har takt 4 zarb
     const D3=146.83, Fs3=185, A3=220, B3=246.94, Cs4=277.18, D4=293.66, E4=329.63, Fs4=369.99, G4=392, A4=440, B4=493.88,
           Cs5=554.37, D5=587.33, E5=659.25, Fs5=739.99, G5=783.99, A5=880, B5=987.77;
@@ -289,16 +294,16 @@ const Snd = {
     };
     const strings = (fr, t, dur, v=.022) => fr.forEach(f => [-6, 0, 6].forEach(det => {
       const o = c.createOscillator(), g = c.createGain(), lp = c.createBiquadFilter();
-      o.type = "sawtooth"; o.frequency.value = f; o.detune.value = det;
-      lp.type = "lowpass"; lp.frequency.value = 1500; lp.Q.value = .5;
+      o.type = "triangle"; o.frequency.value = f; o.detune.value = det; v = Math.min(v, .016);
+      lp.type = "lowpass"; lp.frequency.value = 2200; lp.Q.value = .3;
       g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t+1.4); g.gain.setValueAtTime(v, t+dur-.6); g.gain.linearRampToValueAtTime(0, t+dur+.8);
       o.connect(lp); lp.connect(g); g.connect(bus); o.start(t); o.stop(t+dur+.9);
     }));
     const cello = (f, t, dur) => {
       const o = c.createOscillator(), o2 = c.createOscillator(), g = c.createGain(), lp = c.createBiquadFilter();
       o.type = "sawtooth"; o.frequency.value = f; o2.type = "sine"; o2.frequency.value = f;
-      lp.type = "lowpass"; lp.frequency.value = 420;
-      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.09, t+.5); g.gain.setValueAtTime(.09, t+dur-.4); g.gain.linearRampToValueAtTime(0, t+dur+.6);
+      lp.type = "lowpass"; lp.frequency.value = 600; o.type = "triangle";
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.05, t+.5); g.gain.setValueAtTime(.05, t+dur-.4); g.gain.linearRampToValueAtTime(0, t+dur+.6);
       o.connect(lp); o2.connect(lp); lp.connect(g); g.connect(bus); o.start(t); o2.start(t); o.stop(t+dur+.7); o2.stop(t+dur+.7);
     };
     let b = 0;
@@ -327,8 +332,8 @@ const Snd = {
   thump(){
     if(!this.on) return;
     const c=this.ctx, t=c.currentTime, o=c.createOscillator(), g=c.createGain();
-    o.type="sine"; o.frequency.setValueAtTime(85,t); o.frequency.exponentialRampToValueAtTime(38,t+.28);
-    g.gain.setValueAtTime(.13,t); g.gain.exponentialRampToValueAtTime(.0001,t+.32);
+    o.type="sine"; o.frequency.setValueAtTime(140,t); o.frequency.exponentialRampToValueAtTime(80,t+.25);
+    g.gain.setValueAtTime(.05,t); g.gain.exponentialRampToValueAtTime(.0001,t+.32);
     o.connect(g); g.connect(this.master); o.start(t); o.stop(t+.35);
     const s=c.createBufferSource(); s.buffer=this.noise; s.playbackRate.value=.35;
     const f=c.createBiquadFilter(); f.type="lowpass"; f.frequency.value=900;
@@ -363,7 +368,7 @@ const Snd = {
     s.connect(f); f.connect(g); g.connect(this.master); s.start();
   },
   bell(f=880, v=.08){ this.tone(f,3,v); this.tone(f*2.005,2,v*.3); },
-  low(){ this.tone(73.4,2.6,.2,"sine",false); },
+  low(){ this.tone(110,2.4,.08,"sine",false); },
   sweep(){
     if(!this.on) return;
     const c=this.ctx, t=c.currentTime, o=c.createOscillator(), g=c.createGain(), f=c.createBiquadFilter();
