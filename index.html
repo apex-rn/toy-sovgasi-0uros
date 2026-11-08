@@ -157,11 +157,17 @@ const CONFIG = { aka: "Muhammadrizo", kelin: "Rano", kelinMurojaat: "kennayam", 
 /* ============ XAT ============
    h: bo'lim,  big: katta,  gold: oltin,  slow: sekin,  quiet: musiqa jimiydi
    matn ichida [[p:ms]] — to'xtash */
+// Akam qachon ochishiga qarab: to'y kuni — "bugun", ertasi — "kecha", keyinroq — kunsiz (Toshkent vaqti)
+const TOY_KUNI = "2026-11-08";
+const kunFarqi = Math.round((Date.parse(new Date(Date.now() + 5*3600e3).toISOString().slice(0,10)) - Date.parse(TOY_KUNI)) / 864e5);
+const DAY = kunFarqi <= 0 ? "bugun" : kunFarqi === 1 ? "kecha" : "";
 const SLIDES = [
-  { h:"// 01 — bugun", t:"Assalomu alaykum, akam." },
-  { t:"Mana bugun eng uzoq kutilgan kuning —\nto'ying ekan." },
+  { h:"// 01 — " + (DAY || "to'ying"), t:"Assalomu alaykum, akam." },
+  { t: DAY === "bugun" ? "Mana bugun eng uzoq kutilgan kuning —\nto'ying ekan."
+     : DAY === "kecha" ? "Mana kecha eng uzoq kutilgan kuning —\nto'ying bo'ldi."
+     :                   "Mana eng uzoq kutilgan kuning —\nto'ying ham bo'ldi." },
   { t:"Seni chin qalbimdan tabriklayman.\nChin yuragimdan baxt tilayman." },
-  { t:"Bugun to'ying bo'layotganini,\nseni kuyov bola kiyimida ko'rib\njuda xursand bo'ldim.\nSenga juda yarasharkan." },
+  { t:(DAY ? DAY[0].toUpperCase() + DAY.slice(1) + " t" : "T") + "o'ying bo'layotganini,\nseni kuyov bola kiyimida ko'rib\njuda xursand bo'ldim.\nSenga juda yarasharkan." },
   { t:"To'yingda ukang bo'lib oldingda turishni,\nto'yingni o'z ko'zim bilan ko'rishni xohlagandim.[[p:1200]]\nLekin afsus, oldingda bo'la olmadim." },
   { t:"Lekin to'yingni telefonda bo'lsa ham ko'rganimdan xursandman.\nJuda zo'r o'tibdi — men kutganimdan ham yaxshi." },
 
